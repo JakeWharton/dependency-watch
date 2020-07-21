@@ -4,6 +4,20 @@ Script to wait for an artifact to appear on Maven Central or to monitor coordina
 versions.
 
 
+## Install
+
+**Mac OS**
+
+```
+$ brew install JakeWharton/repo/dependency-watch
+```
+
+**Other**
+
+Download ZIP from [latest release](https://github.com/JakeWharton/dependency-watch/releases/latest) and
+run `bin/dependency-watch` or `bin/dependency-watch.bat`.
+
+
 ## Usage
 
 ```
