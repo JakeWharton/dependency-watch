@@ -7,6 +7,7 @@ import nl.adaptivity.xmlutil.serialization.XmlChildrenName
 import nl.adaptivity.xmlutil.serialization.XmlSerialName
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -18,16 +19,15 @@ interface MavenRepository {
 	suspend fun metadata(groupId: String, artifactId: String): ArtifactMetadata
 }
 
-class MavenCentral(
-	private val okhttp: OkHttpClient
+class Maven2Repository(
+	private val url: HttpUrl,
+	private val okhttp: OkHttpClient,
 ) : MavenRepository {
 	override suspend fun metadata(groupId: String, artifactId: String): ArtifactMetadata {
+		val metadataUrl = url.resolve("${groupId.replace('.', '/')}/$artifactId/maven-metadata.xml")!!
+
 		return suspendCancellableCoroutine { continuation ->
-			val call = okhttp.newCall(
-				Request.Builder()
-					.url("https://repo1.maven.org/maven2/${groupId.replace('.', '/')}/$artifactId/maven-metadata.xml")
-					.build()
-			)
+			val call = okhttp.newCall(Request.Builder().url(metadataUrl).build())
 			call.enqueue(object : Callback {
 				override fun onResponse(call: Call, response: Response) {
 					response.use {

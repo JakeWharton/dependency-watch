@@ -14,6 +14,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.supervisorScope
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC
@@ -68,7 +69,7 @@ private class AwaitCommand : DependencyWatchCommand(
 				}
 			}
 			.build()
-		val mavenRepository = MavenCentral(okhttp)
+		val mavenRepository = Maven2Repository(mavenCentral, okhttp)
 
 		while (true) {
 			debugln { "Fetching metadata for $groupId:$artifactId..."  }
@@ -111,7 +112,7 @@ private class MonitorCommand(
 				}
 			}
 			.build()
-		val mavenRepository = MavenCentral(okhttp)
+		val mavenRepository = Maven2Repository(mavenCentral, okhttp)
 		val database = InMemoryDatabase()
 
 		while (true) {
@@ -146,6 +147,8 @@ private class MonitorCommand(
 		}
 	}
 }
+
+private val mavenCentral = "https://repo1.maven.org/maven2/".toHttpUrl()
 
 private fun parseCoordinates(coordinates: String): Triple<String, String, String?> {
 	val firstColon = coordinates.indexOf(':')
