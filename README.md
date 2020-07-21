@@ -16,8 +16,8 @@ Options:
 Commands:
   await    Wait for an artifact to appear on Maven central then exit
   monitor  Constantly monitor Maven coordinates for new versions
-
-
+```
+```
 $ dependency-watch await --help
 Usage: dependency-watch await [OPTIONS] coordinates
 
@@ -28,8 +28,8 @@ Options:
 
 Arguments:
   coordinates  Maven coordinates (e.g., 'com.example:example:1.0.0')
-
-
+```
+```
 $ dependency-watch monitor --help
 Usage: dependency-watch monitor [OPTIONS] config
 
