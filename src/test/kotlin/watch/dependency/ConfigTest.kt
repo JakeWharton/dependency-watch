@@ -8,13 +8,11 @@ class ConfigTest {
 		val yaml = """
 			|coordinates:
 			| - com.squareup.retrofit2:retrofit
-			| - com.squareup.okhttp3:okhttp:4.8.0
 			|""".trimMargin()
 
 		val expected = Config(
 			coordinates = listOf(
 				"com.squareup.retrofit2:retrofit",
-				"com.squareup.okhttp3:okhttp:4.8.0",
 			),
 		)
 
