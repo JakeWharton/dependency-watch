@@ -7,7 +7,6 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Rule
 import org.junit.Test
-import watch.dependency.ArtifactMetadata.Versioning
 
 class Maven2RepositoryTest {
 	@get:Rule val server = MockWebServer()
@@ -36,20 +35,15 @@ class Maven2RepositoryTest {
 				|</metadata>
 				|""".trimMargin()))
 
-		val actual = repository.metadata("com.example", "example")
-		val expected = ArtifactMetadata(
-			versioning = Versioning(
-				versions = listOf(
-					"1.0.0-alpha1",
-					"1.0.0-alpha2",
-					"1.0.0-beta3",
-					"1.0.0-beta4",
-					"1.0.0",
-					"1.1.0",
-				),
-			),
+		val versions = repository.versions("com.example", "example")
+		assertThat(versions).containsExactly(
+			"1.0.0-alpha1",
+			"1.0.0-alpha2",
+			"1.0.0-beta3",
+			"1.0.0-beta4",
+			"1.0.0",
+			"1.1.0",
 		)
-		assertThat(actual).isEqualTo(expected)
 
 		val request = server.takeRequest()
 		assertThat(request.requestUrl)

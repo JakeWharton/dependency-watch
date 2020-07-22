@@ -102,10 +102,10 @@ private class AwaitCommand : DependencyWatchCommand(
 
 		while (true) {
 			debugln { "Fetching metadata for $groupId:$artifactId..."  }
-			val metadata = mavenRepository.metadata(groupId, artifactId)
-			debugln { "$groupId:$artifactId $metadata" }
+			val versions = mavenRepository.versions(groupId, artifactId)
+			debugln { "$groupId:$artifactId $versions" }
 
-			if (version in metadata.versioning.versions) {
+			if (version in versions) {
 				break
 			}
 
@@ -147,10 +147,10 @@ private class MonitorCommand(
 
 					launch(start = UNDISPATCHED) {
 						debugln { "Fetching metadata for $groupId:$artifactId..."  }
-						val metadata = mavenRepository.metadata(groupId, artifactId)
-						debugln { "$groupId:$artifactId $metadata" }
+						val versions = mavenRepository.versions(groupId, artifactId)
+						debugln { "$groupId:$artifactId $versions" }
 
-						for (mavenVersion in metadata.versioning.versions) {
+						for (mavenVersion in versions) {
 							if (!database.coordinatesSeen(groupId, artifactId, mavenVersion)) {
 								database.markCoordinatesSeen(groupId, artifactId, mavenVersion)
 

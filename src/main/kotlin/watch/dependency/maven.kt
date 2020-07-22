@@ -9,18 +9,19 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 interface MavenRepository {
-	suspend fun metadata(groupId: String, artifactId: String): ArtifactMetadata
+	suspend fun versions(groupId: String, artifactId: String): Set<String>
 }
 
 class Maven2Repository(
 	private val okhttp: OkHttpClient,
 	private val url: HttpUrl,
 ) : MavenRepository {
-	override suspend fun metadata(groupId: String, artifactId: String): ArtifactMetadata {
+	override suspend fun versions(groupId: String, artifactId: String): Set<String> {
 		val metadataUrl = url.resolve("${groupId.replace('.', '/')}/$artifactId/maven-metadata.xml")!!
 		val call = okhttp.newCall(Request.Builder().url(metadataUrl).build())
 		val body = call.await()
-		return xmlFormat.parse(ArtifactMetadata.serializer(), body)
+		val metadata = xmlFormat.parse(ArtifactMetadata.serializer(), body)
+		return metadata.versioning.versions.toSet()
 	}
 
 	private companion object {
@@ -28,17 +29,17 @@ class Maven2Repository(
 			unknownChildHandler = { _, _, _, _ -> }
 		}
 	}
-}
 
-@Serializable
-@XmlSerialName("metadata", "", "")
-data class ArtifactMetadata(
-	@XmlSerialName("versioning", "", "")
-	val versioning: Versioning,
-) {
 	@Serializable
-	data class Versioning(
-		@XmlChildrenName("version", "", "")
-		val versions: List<String>,
-	)
+	@XmlSerialName("metadata", "", "")
+	private data class ArtifactMetadata(
+		@XmlSerialName("versioning", "", "")
+		val versioning: Versioning,
+	) {
+		@Serializable
+		data class Versioning(
+			@XmlChildrenName("version", "", "")
+			val versions: List<String>,
+		)
+	}
 }
