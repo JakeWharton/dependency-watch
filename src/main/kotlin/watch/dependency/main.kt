@@ -37,8 +37,8 @@ private abstract class DependencyWatchCommand(
 	name: String,
 	help: String = ""
 ) : CliktCommand(name = name, help = help) {
-	protected val debug by option("--debug", hidden = true).flag()
-	protected val ifttt by option("--ifttt", help = "IFTTT webhook URL to trigger (see https://ifttt.com/maker_webhooks)")
+	private val debug by option("--debug", hidden = true).flag()
+	private val ifttt by option("--ifttt", help = "IFTTT webhook URL to trigger (see https://ifttt.com/maker_webhooks)")
 		.convert { it.toHttpUrl() }
 
 	protected inline fun debugln(factory: () -> String) {
@@ -46,21 +46,8 @@ private abstract class DependencyWatchCommand(
 			println("[DEBUG] ${factory()}")
 		}
 	}
-}
 
-private class AwaitCommand : DependencyWatchCommand(
-	name = "await",
-	help = "Wait for an artifact to appear on Maven central then exit",
-) {
-	private val coordinates by argument("coordinates", help = "Maven coordinates (e.g., 'com.example:example:1.0.0')")
-
-	override fun run() = runBlocking {
-		val (groupId, artifactId, version) = parseCoordinates(coordinates)
-		checkNotNull(version) {
-			"Coordinate version must be present and non-empty: '$coordinates'"
-		}
-		debugln { "$groupId:$artifactId:$version" }
-
+	final override fun run() = runBlocking {
 		val okhttp = OkHttpClient.Builder()
 			.apply {
 				if (debug) {
@@ -72,13 +59,46 @@ private class AwaitCommand : DependencyWatchCommand(
 				}
 			}
 			.build()
-		val mavenRepository = Maven2Repository(mavenCentral, okhttp)
+
+		val mavenCentralUrl = "https://repo1.maven.org/maven2/".toHttpUrl()
+		val mavenCentral = Maven2Repository(mavenCentralUrl, okhttp)
+
 		val notifiers = buildList {
 			add(ConsoleNotifier)
 			ifttt?.let { ifttt ->
 				add(IftttNotifier(okhttp, ifttt))
 			}
 		}
+
+		try {
+			execute(mavenCentral, notifiers)
+		} finally {
+			okhttp.dispatcher.executorService.shutdown()
+			okhttp.connectionPool.evictAll()
+		}
+	}
+
+	protected abstract suspend fun execute(
+		mavenRepository: Maven2Repository,
+		notifiers: List<Notifier>,
+	)
+}
+
+private class AwaitCommand : DependencyWatchCommand(
+	name = "await",
+	help = "Wait for an artifact to appear on Maven central then exit",
+) {
+	private val coordinates by argument("coordinates", help = "Maven coordinates (e.g., 'com.example:example:1.0.0')")
+
+	override suspend fun execute(
+		mavenRepository: Maven2Repository,
+		notifiers: List<Notifier>,
+	) {
+		val (groupId, artifactId, version) = parseCoordinates(coordinates)
+		checkNotNull(version) {
+			"Coordinate version must be present and non-empty: '$coordinates'"
+		}
+		debugln { "$groupId:$artifactId:$version" }
 
 		while (true) {
 			debugln { "Fetching metadata for $groupId:$artifactId..."  }
@@ -97,9 +117,6 @@ private class AwaitCommand : DependencyWatchCommand(
 		notifiers.forEach { notifier ->
 			notifier.notify(groupId, artifactId, version)
 		}
-
-		okhttp.dispatcher.executorService.shutdown()
-		okhttp.connectionPool.evictAll()
 	}
 }
 
@@ -111,26 +128,11 @@ private class MonitorCommand(
 ) {
 	private val config by argument("config").path(fs)
 
-	override fun run() = runBlocking {
-		val okhttp = OkHttpClient.Builder()
-			.apply {
-				if (debug) {
-					addNetworkInterceptor(HttpLoggingInterceptor(object : Logger {
-						override fun log(message: String) {
-							debugln { message }
-						}
-					}).setLevel(BASIC))
-				}
-			}
-			.build()
-		val mavenRepository = Maven2Repository(mavenCentral, okhttp)
+	override suspend fun execute(
+		mavenRepository: Maven2Repository,
+		notifiers: List<Notifier>,
+	) {
 		val database = InMemoryDatabase()
-		val notifiers = buildList {
-			add(ConsoleNotifier)
-			ifttt?.let { ifttt ->
-				add(IftttNotifier(okhttp, ifttt))
-			}
-		}
 
 		while (true) {
 			val config = Config.parse(config.readText())
@@ -167,8 +169,6 @@ private class MonitorCommand(
 		}
 	}
 }
-
-private val mavenCentral = "https://repo1.maven.org/maven2/".toHttpUrl()
 
 private fun parseCoordinates(coordinates: String): Triple<String, String, String?> {
 	val firstColon = coordinates.indexOf(':')
