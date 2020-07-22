@@ -61,7 +61,7 @@ private abstract class DependencyWatchCommand(
 			.build()
 
 		val mavenCentralUrl = "https://repo1.maven.org/maven2/".toHttpUrl()
-		val mavenCentral = Maven2Repository(mavenCentralUrl, okhttp)
+		val mavenCentral = Maven2Repository(okhttp, mavenCentralUrl)
 
 		val notifiers = buildList {
 			add(ConsoleNotifier)

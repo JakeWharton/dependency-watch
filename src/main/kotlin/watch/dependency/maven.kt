@@ -13,8 +13,8 @@ interface MavenRepository {
 }
 
 class Maven2Repository(
-	private val url: HttpUrl,
 	private val okhttp: OkHttpClient,
+	private val url: HttpUrl,
 ) : MavenRepository {
 	override suspend fun metadata(groupId: String, artifactId: String): ArtifactMetadata {
 		val metadataUrl = url.resolve("${groupId.replace('.', '/')}/$artifactId/maven-metadata.xml")!!
