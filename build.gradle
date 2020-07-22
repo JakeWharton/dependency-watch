@@ -27,6 +27,7 @@ dependencies {
 
 	testImplementation 'junit:junit:4.13'
 	testImplementation 'com.google.truth:truth:1.0.1'
+	testImplementation 'com.squareup.okhttp3:mockwebserver:4.7.2'
 }
 
 repositories {
@@ -54,6 +55,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile).configureEach {
 				'-Xopt-in=kotlin.time.ExperimentalTime',
 				'-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
 				'-Xopt-in=kotlinx.coroutines.ObsoleteCoroutinesApi',
+				'-Xopt-in=kotlinx.serialization.UnstableDefault',
 		]
 	}
 }

@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.NoOpCliktCommand
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
@@ -37,6 +38,8 @@ private abstract class DependencyWatchCommand(
 	help: String = ""
 ) : CliktCommand(name = name, help = help) {
 	protected val debug by option("--debug", hidden = true).flag()
+	protected val ifttt by option("--ifttt", help = "IFTTT webhook URL to trigger (see https://ifttt.com/maker_webhooks)")
+		.convert { it.toHttpUrl() }
 
 	protected inline fun debugln(factory: () -> String) {
 		if (debug) {
@@ -70,7 +73,12 @@ private class AwaitCommand : DependencyWatchCommand(
 			}
 			.build()
 		val mavenRepository = Maven2Repository(mavenCentral, okhttp)
-		val notifiers = listOf(ConsoleNotifier)
+		val notifiers = buildList {
+			add(ConsoleNotifier)
+			ifttt?.let { ifttt ->
+				add(IftttNotifier(okhttp, ifttt))
+			}
+		}
 
 		while (true) {
 			debugln { "Fetching metadata for $groupId:$artifactId..."  }
@@ -117,7 +125,12 @@ private class MonitorCommand(
 			.build()
 		val mavenRepository = Maven2Repository(mavenCentral, okhttp)
 		val database = InMemoryDatabase()
-		val notifiers = listOf(ConsoleNotifier)
+		val notifiers = buildList {
+			add(ConsoleNotifier)
+			ifttt?.let { ifttt ->
+				add(IftttNotifier(okhttp, ifttt))
+			}
+		}
 
 		while (true) {
 			val config = Config.parse(config.readText())
