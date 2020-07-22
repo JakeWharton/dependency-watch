@@ -7,8 +7,9 @@ import com.github.ajalt.clikt.core.NoOpCliktCommand
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.convert
-import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.switch
 import com.github.ajalt.clikt.parameters.types.path
 import kotlinx.coroutines.CoroutineStart.UNDISPATCHED
 import kotlinx.coroutines.delay
@@ -37,23 +38,19 @@ private abstract class DependencyWatchCommand(
 	name: String,
 	help: String = ""
 ) : CliktCommand(name = name, help = help) {
-	private val debug by option("--debug", hidden = true).flag()
+	protected val debug by option(hidden = true)
+		.switch<Debug>(mapOf("--debug" to Debug.Console))
+		.default(Debug.Disabled)
 	private val ifttt by option("--ifttt", help = "IFTTT webhook URL to trigger (see https://ifttt.com/maker_webhooks)")
 		.convert { it.toHttpUrl() }
-
-	protected inline fun debugln(factory: () -> String) {
-		if (debug) {
-			println("[DEBUG] ${factory()}")
-		}
-	}
 
 	final override fun run() = runBlocking {
 		val okhttp = OkHttpClient.Builder()
 			.apply {
-				if (debug) {
+				if (debug.enabled) {
 					addNetworkInterceptor(HttpLoggingInterceptor(object : Logger {
 						override fun log(message: String) {
-							debugln { message }
+							debug.log { message }
 						}
 					}).setLevel(BASIC))
 				}
@@ -98,19 +95,19 @@ private class AwaitCommand : DependencyWatchCommand(
 		checkNotNull(version) {
 			"Coordinate version must be present and non-empty: '$coordinates'"
 		}
-		debugln { "$groupId:$artifactId:$version" }
+		debug.log { "$groupId:$artifactId:$version" }
 
 		while (true) {
-			debugln { "Fetching metadata for $groupId:$artifactId..."  }
+			debug.log { "Fetching metadata for $groupId:$artifactId..."  }
 			val versions = mavenRepository.versions(groupId, artifactId)
-			debugln { "$groupId:$artifactId $versions" }
+			debug.log { "$groupId:$artifactId $versions" }
 
 			if (version in versions) {
 				break
 			}
 
 			val pause = 1.minutes
-			debugln { "Sleeping $pause..." }
+			debug.log { "Sleeping $pause..." }
 			delay(pause)
 		}
 
@@ -136,7 +133,7 @@ private class MonitorCommand(
 
 		while (true) {
 			val config = Config.parse(config.readText())
-			debugln { config.toString() }
+			debug.log { config.toString() }
 
 			supervisorScope {
 				for (coordinates in config.coordinates) {
@@ -146,9 +143,9 @@ private class MonitorCommand(
 					}
 
 					launch(start = UNDISPATCHED) {
-						debugln { "Fetching metadata for $groupId:$artifactId..."  }
+						debug.log { "Fetching metadata for $groupId:$artifactId..."  }
 						val versions = mavenRepository.versions(groupId, artifactId)
-						debugln { "$groupId:$artifactId $versions" }
+						debug.log { "$groupId:$artifactId $versions" }
 
 						for (mavenVersion in versions) {
 							if (!database.coordinatesSeen(groupId, artifactId, mavenVersion)) {
@@ -164,7 +161,7 @@ private class MonitorCommand(
 			}
 
 			val pause = 1.minutes
-			debugln { "Sleeping $pause..." }
+			debug.log { "Sleeping $pause..." }
 			delay(pause)
 		}
 	}
