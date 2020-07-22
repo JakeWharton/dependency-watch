@@ -1,9 +1,11 @@
 package watch.dependency
 
+import com.charleskorn.kaml.Yaml
 import kotlinx.coroutines.CoroutineStart.UNDISPATCHED
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import kotlinx.serialization.Serializable
 import java.nio.file.Path
 import kotlin.time.Duration
 import kotlin.time.minutes
@@ -35,7 +37,7 @@ class DependencyWatch(
 	suspend fun monitor(config: Path): Nothing {
 		while (true) {
 			// Parse the config inside the loop so you can edit while running.
-			val parsedConfig = Config.parse(config.readText())
+			val parsedConfig = Yaml.default.parse(Config.serializer(), config.readText())
 			debug.log { parsedConfig.toString() }
 
 			supervisorScope {
@@ -64,4 +66,9 @@ class DependencyWatch(
 			delay(checkInterval)
 		}
 	}
+
+	@Serializable
+	private data class Config(
+		val coordinates: List<String>,
+	)
 }
