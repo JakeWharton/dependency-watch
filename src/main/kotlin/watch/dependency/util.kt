@@ -40,3 +40,30 @@ suspend fun Call.await(): String {
 		}
 	}
 }
+
+fun parseCoordinates(coordinates: String): Triple<String, String, String?> {
+	val firstColon = coordinates.indexOf(':')
+	check(firstColon > 0) {
+		"Coordinate ':' must be present and after non-empty groupId: '$coordinates'"
+	}
+	val groupId = coordinates.substring(0, firstColon)
+
+	val secondColon = coordinates.indexOf(':', startIndex = firstColon + 1)
+	if (secondColon == -1) {
+		check(firstColon < coordinates.length) {
+			"Coordinate artifactId must be non-empty: '$coordinates'"
+		}
+		return Triple(groupId, coordinates.substring(firstColon + 1), null)
+	}
+	check(secondColon > firstColon + 1) {
+		"Coordinate artifactId must be non-empty: '$coordinates'"
+	}
+	val artifactId = coordinates.substring(firstColon + 1, secondColon)
+
+	check(secondColon < coordinates.length) {
+		"Coordinate version must be non-empty: '$coordinates'"
+	}
+	val version = coordinates.substring(secondColon + 1)
+
+	return Triple(groupId, artifactId, version)
+}

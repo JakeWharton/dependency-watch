@@ -38,17 +38,4 @@ class CompositeNotifierTest {
 			"com.example:example:1.0.0",
 		)
 	}
-
-	private class RecordingNotifier : Notifier {
-		private val _notifications = mutableListOf<String>()
-		val notifications: List<String> = _notifications
-
-		override suspend fun notify(
-			groupId: String,
-			artifactId: String,
-			version: String
-		) {
-			_notifications += "$groupId:$artifactId:$version"
-		}
-	}
 }
