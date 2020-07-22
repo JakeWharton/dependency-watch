@@ -70,6 +70,7 @@ private class AwaitCommand : DependencyWatchCommand(
 			}
 			.build()
 		val mavenRepository = Maven2Repository(mavenCentral, okhttp)
+		val notifiers = listOf(ConsoleNotifier)
 
 		while (true) {
 			debugln { "Fetching metadata for $groupId:$artifactId..."  }
@@ -85,7 +86,9 @@ private class AwaitCommand : DependencyWatchCommand(
 			delay(pause)
 		}
 
-		println(coordinates)
+		notifiers.forEach { notifier ->
+			notifier.notify(groupId, artifactId, version)
+		}
 
 		okhttp.dispatcher.executorService.shutdown()
 		okhttp.connectionPool.evictAll()
@@ -114,6 +117,7 @@ private class MonitorCommand(
 			.build()
 		val mavenRepository = Maven2Repository(mavenCentral, okhttp)
 		val database = InMemoryDatabase()
+		val notifiers = listOf(ConsoleNotifier)
 
 		while (true) {
 			val config = Config.parse(config.readText())
@@ -134,7 +138,10 @@ private class MonitorCommand(
 						for (mavenVersion in metadata.versioning.versions) {
 							if (!database.coordinatesSeen(groupId, artifactId, mavenVersion)) {
 								database.markCoordinatesSeen(groupId, artifactId, mavenVersion)
-								println("$groupId:$artifactId:$mavenVersion")
+
+								notifiers.forEach { notifier ->
+									notifier.notify(groupId, artifactId, mavenVersion)
+								}
 							}
 						}
 					}
