@@ -13,6 +13,24 @@ interface Notifier {
 	suspend fun notify(groupId: String, artifactId: String, version: String)
 }
 
+fun List<Notifier>.flatten(): Notifier {
+	return if (size == 1) get(0) else CompositeNotifier(this)
+}
+
+private class CompositeNotifier(
+	private val notifiers: List<Notifier>,
+) : Notifier {
+	override suspend fun notify(
+		groupId: String,
+		artifactId: String,
+		version: String
+	) {
+		for (notifier in notifiers) {
+			notifier.notify(groupId, artifactId, version)
+		}
+	}
+}
+
 object ConsoleNotifier : Notifier {
 	override suspend fun notify(groupId: String, artifactId: String, version: String) {
 		println("$groupId:$artifactId:$version")

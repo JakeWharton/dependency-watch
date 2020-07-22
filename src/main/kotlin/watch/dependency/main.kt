@@ -63,15 +63,15 @@ private abstract class DependencyWatchCommand(
 		val mavenCentralUrl = "https://repo1.maven.org/maven2/".toHttpUrl()
 		val mavenCentral = Maven2Repository(okhttp, mavenCentralUrl)
 
-		val notifiers = buildList {
+		val notifier = buildList {
 			add(ConsoleNotifier)
 			ifttt?.let { ifttt ->
 				add(IftttNotifier(okhttp, ifttt))
 			}
-		}
+		}.flatten()
 
 		try {
-			execute(mavenCentral, notifiers)
+			execute(mavenCentral, notifier)
 		} finally {
 			okhttp.dispatcher.executorService.shutdown()
 			okhttp.connectionPool.evictAll()
@@ -80,7 +80,7 @@ private abstract class DependencyWatchCommand(
 
 	protected abstract suspend fun execute(
 		mavenRepository: Maven2Repository,
-		notifiers: List<Notifier>,
+		notifier: Notifier,
 	)
 }
 
@@ -92,7 +92,7 @@ private class AwaitCommand : DependencyWatchCommand(
 
 	override suspend fun execute(
 		mavenRepository: Maven2Repository,
-		notifiers: List<Notifier>,
+		notifier: Notifier,
 	) {
 		val (groupId, artifactId, version) = parseCoordinates(coordinates)
 		checkNotNull(version) {
@@ -114,9 +114,7 @@ private class AwaitCommand : DependencyWatchCommand(
 			delay(pause)
 		}
 
-		notifiers.forEach { notifier ->
-			notifier.notify(groupId, artifactId, version)
-		}
+		notifier.notify(groupId, artifactId, version)
 	}
 }
 
@@ -130,7 +128,7 @@ private class MonitorCommand(
 
 	override suspend fun execute(
 		mavenRepository: Maven2Repository,
-		notifiers: List<Notifier>,
+		notifier: Notifier,
 	) {
 		val database = InMemoryDatabase()
 
@@ -153,10 +151,7 @@ private class MonitorCommand(
 						for (mavenVersion in versions) {
 							if (!database.coordinatesSeen(groupId, artifactId, mavenVersion)) {
 								database.markCoordinatesSeen(groupId, artifactId, mavenVersion)
-
-								notifiers.forEach { notifier ->
-									notifier.notify(groupId, artifactId, mavenVersion)
-								}
+								notifier.notify(groupId, artifactId, mavenVersion)
 							}
 						}
 					}
