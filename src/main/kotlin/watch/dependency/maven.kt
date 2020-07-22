@@ -20,7 +20,13 @@ class Maven2Repository(
 		val metadataUrl = url.resolve("${groupId.replace('.', '/')}/$artifactId/maven-metadata.xml")!!
 		val call = okhttp.newCall(Request.Builder().url(metadataUrl).build())
 		val body = call.await()
-		return ArtifactMetadata.parse(body)
+		return xmlFormat.parse(ArtifactMetadata.serializer(), body)
+	}
+
+	private companion object {
+		private val xmlFormat = XML {
+			unknownChildHandler = { _, _, _, _ -> }
+		}
 	}
 }
 
@@ -30,16 +36,6 @@ data class ArtifactMetadata(
 	@XmlSerialName("versioning", "", "")
 	val versioning: Versioning,
 ) {
-	companion object {
-		private val format = XML {
-			unknownChildHandler = { _, _, _, _ -> }
-		}
-
-		fun parse(xml: String): ArtifactMetadata {
-			return format.parse(serializer(), xml)
-		}
-	}
-
 	@Serializable
 	data class Versioning(
 		@XmlChildrenName("version", "", "")
