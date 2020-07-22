@@ -41,7 +41,10 @@ private abstract class DependencyWatchCommand(
 	protected val debug by option(hidden = true)
 		.switch<Debug>(mapOf("--debug" to Debug.Console))
 		.default(Debug.Disabled)
-	private val ifttt by option("--ifttt", help = "IFTTT webhook URL to trigger (see https://ifttt.com/maker_webhooks)")
+	private val ifttt by option("--ifttt",
+			help = "IFTTT webhook URL to trigger (see https://ifttt.com/maker_webhooks)",
+			metavar = "URL"
+		)
 		.convert { it.toHttpUrl() }
 
 	final override fun run() = runBlocking {
