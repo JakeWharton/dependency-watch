@@ -19,6 +19,9 @@ import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC
 import okhttp3.logging.HttpLoggingInterceptor.Logger
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
+import java.time.Duration
+import kotlin.time.minutes
+import kotlin.time.toKotlinDuration
 
 fun main(vararg args: String) {
 	NoOpCliktCommand(name = "dependency-watch")
@@ -36,10 +39,12 @@ private abstract class DependencyWatchCommand(
 	protected val debug by option(hidden = true)
 		.switch<Debug>(mapOf("--debug" to Debug.Console))
 		.default(Debug.Disabled)
-	private val ifttt by option("--ifttt",
-			help = "IFTTT webhook URL to trigger (see https://ifttt.com/maker_webhooks)",
-			metavar = "URL"
-		)
+	private val checkInterval by option("--interval", metavar = "DURATION")
+		.copy(help = "Amount of time between checks (ISO8601 duration format, default 1 minute)")
+		.convert { Duration.parse(it).toKotlinDuration() }
+		.default(1.minutes)
+	private val ifttt by option("--ifttt", metavar = "URL")
+		.copy(help = "IFTTT webhook URL to trigger (see https://ifttt.com/maker_webhooks)")
 		.convert { it.toHttpUrl() }
 
 	final override fun run() = runBlocking {
@@ -69,6 +74,7 @@ private abstract class DependencyWatchCommand(
 			mavenRepository = mavenCentral,
 			database = InMemoryDatabase(),
 			notifier = notifier,
+			checkInterval = checkInterval,
 			debug = debug,
 		)
 

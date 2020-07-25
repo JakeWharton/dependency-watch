@@ -8,13 +8,12 @@ import kotlinx.coroutines.supervisorScope
 import kotlinx.serialization.Serializable
 import java.nio.file.Path
 import kotlin.time.Duration
-import kotlin.time.minutes
 
 class DependencyWatch(
 	private val mavenRepository: MavenRepository,
 	private val database: Database,
 	private val notifier: Notifier,
-	private val checkInterval: Duration = 1.minutes,
+	private val checkInterval: Duration,
 	private val debug: Debug = Debug.Disabled,
 ) {
 	suspend fun await(coordinate: MavenCoordinate, version: String) {
