@@ -4,6 +4,9 @@ import com.google.common.jimfs.Jimfs
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineStart.UNDISPATCHED
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
+import org.junit.Assert.fail
 import org.junit.Test
 import kotlin.time.seconds
 
@@ -38,6 +41,28 @@ class DependencyWatchTest {
 		assertThat(notifier.notifications).containsExactly("com.example:example:1.0")
 	}
 
+	@Test fun monitorRunsOnceByDefault() = runBlocking<Unit> {
+		val config = fs.resolve("config.yaml")
+		config.writeText("""
+			|coordinates:
+			| - com.example:example-a
+		""".trimMargin())
+
+		withTimeout(1.seconds) {
+			app.monitor(config)
+		}
+		assertThat(notifier.notifications).isEmpty()
+
+		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
+
+		withTimeout(1.seconds) {
+			app.monitor(config)
+		}
+		assertThat(notifier.notifications).containsExactly(
+			"com.example:example-a:1.0",
+		)
+	}
+
 	@Test fun monitorNotifiesOnceAvailable() = test { context ->
 		val config = fs.resolve("config.yaml")
 		config.writeText("""
@@ -47,7 +72,8 @@ class DependencyWatchTest {
 
 		// Start undispatched to immediately trigger first check.
 		val monitorJob = launch(start = UNDISPATCHED) {
-			app.monitor(config)
+			app.monitor(config, watch = true)
+			fail()
 		}
 
 		assertThat(notifier.notifications).isEmpty()
@@ -73,7 +99,8 @@ class DependencyWatchTest {
 
 		// Start undispatched to immediately trigger first check.
 		val monitorJob = launch(start = UNDISPATCHED) {
-			app.monitor(config)
+			app.monitor(config, watch = true)
+			fail()
 		}
 
 		assertThat(notifier.notifications).containsExactly(

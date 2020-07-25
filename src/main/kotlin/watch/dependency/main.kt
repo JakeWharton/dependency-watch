@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
 import com.github.ajalt.clikt.parameters.types.path
@@ -117,10 +118,12 @@ private class MonitorCommand(
 	help = "Constantly monitor Maven coordinates for new versions",
 ) {
 	private val config by argument("config").path(fs)
+	private val watch by option("--watch").flag()
+		.copy(help = "Continually monitor for new versions every '--interval'")
 
 	override suspend fun execute(
 		dependencyWatch: DependencyWatch,
 	) {
-		dependencyWatch.monitor(config)
+		dependencyWatch.monitor(config, watch)
 	}
 }
