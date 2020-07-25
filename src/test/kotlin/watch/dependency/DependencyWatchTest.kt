@@ -21,14 +21,14 @@ class DependencyWatchTest {
 	@Test fun awaitNotifiesOncePresent() = test { context ->
 		// Start undispatched to suspend on waiting for delay.
 		launch(start = UNDISPATCHED) {
-			app.await("com.example", "example", "1.0")
+			app.await(MavenCoordinate("com.example", "example"), "1.0")
 		}
 
 		context.advanceTimeBy(5.seconds)
 		context.triggerActions()
 		assertThat(notifier.notifications).isEmpty()
 
-		mavenRepository.addArtifact("com.example", "example", "1.0")
+		mavenRepository.addArtifact(MavenCoordinate("com.example", "example"), "1.0")
 		context.advanceTimeBy(4.seconds)
 		context.triggerActions()
 		assertThat(notifier.notifications).isEmpty()
@@ -52,7 +52,7 @@ class DependencyWatchTest {
 
 		assertThat(notifier.notifications).isEmpty()
 
-		mavenRepository.addArtifact("com.example", "example-a", "1.0")
+		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 
 		context.advanceTimeBy(5.seconds)
 		assertThat(notifier.notifications).containsExactly(
@@ -69,7 +69,7 @@ class DependencyWatchTest {
 			| - com.example:example-a
 		""".trimMargin())
 
-		mavenRepository.addArtifact("com.example", "example-a", "1.0")
+		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 
 		// Start undispatched to immediately trigger first check.
 		val monitorJob = launch(start = UNDISPATCHED) {
@@ -81,7 +81,7 @@ class DependencyWatchTest {
 		)
 
 		// Add artifact to repo but not to config. Should not notify.
-		mavenRepository.addArtifact("com.example", "example-b", "2.0")
+		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-b"), "2.0")
 		context.advanceTimeBy(5.seconds)
 		assertThat(notifier.notifications).containsExactly(
 			"com.example:example-a:1.0",

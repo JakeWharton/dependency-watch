@@ -1,16 +1,18 @@
 package watch.dependency
 
 class FakeMavenRepository : MavenRepository {
-	private val versions = mutableMapOf<String, MutableSet<String>>()
+	private val versions = mutableMapOf<MavenCoordinate, MutableSet<String>>()
 
-	fun addArtifact(groupId: String, artifactId: String, version: String) {
-		versions.getOrPut("$groupId:$artifactId") { mutableSetOf() }.add(version)
+	fun addArtifact(
+		coordinate: MavenCoordinate,
+		version: String,
+	) {
+		versions.getOrPut(coordinate, ::LinkedHashSet).add(version)
 	}
 
 	override suspend fun versions(
-		groupId: String,
-		artifactId: String
+		coordinate: MavenCoordinate,
 	): Set<String> {
-		return versions.getOrDefault("$groupId:$artifactId", emptySet())
+		return versions[coordinate] ?: emptySet()
 	}
 }

@@ -10,7 +10,7 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
 interface Notifier {
-	suspend fun notify(groupId: String, artifactId: String, version: String)
+	suspend fun notify(coordinate: MavenCoordinate, version: String)
 }
 
 fun List<Notifier>.flatten(): Notifier {
@@ -21,19 +21,18 @@ private class CompositeNotifier(
 	private val notifiers: List<Notifier>,
 ) : Notifier {
 	override suspend fun notify(
-		groupId: String,
-		artifactId: String,
-		version: String
+		coordinate: MavenCoordinate,
+		version: String,
 	) {
 		for (notifier in notifiers) {
-			notifier.notify(groupId, artifactId, version)
+			notifier.notify(coordinate, version)
 		}
 	}
 }
 
 object ConsoleNotifier : Notifier {
-	override suspend fun notify(groupId: String, artifactId: String, version: String) {
-		println("$groupId:$artifactId:$version")
+	override suspend fun notify(coordinate: MavenCoordinate, version: String) {
+		println("${coordinate.groupId}:${coordinate.artifactId}:$version")
 	}
 }
 
@@ -42,12 +41,11 @@ class IftttNotifier(
 	private val url: HttpUrl,
 ) : Notifier {
 	override suspend fun notify(
-		groupId: String,
-		artifactId: String,
+		coordinate: MavenCoordinate,
 		version: String,
 	) {
 		val body = PostBody(
-			value1 = "$groupId:$artifactId",
+			value1 = "${coordinate.groupId}:${coordinate.artifactId}",
 			value2 = version,
 		)
 		val call = okhttp.newCall(Request.Builder().url(url).post(body.toJson()).build())

@@ -17,11 +17,11 @@ class DependencyWatch(
 	private val checkInterval: Duration = 1.minutes,
 	private val debug: Debug = Debug.Disabled,
 ) {
-	suspend fun await(groupId: String, artifactId: String, version: String) {
+	suspend fun await(coordinate: MavenCoordinate, version: String) {
 		while (true) {
-			debug.log { "Fetching metadata for $groupId:$artifactId..."  }
-			val versions = mavenRepository.versions(groupId, artifactId)
-			debug.log { "$groupId:$artifactId $versions" }
+			debug.log { "Fetching metadata for $coordinate..."  }
+			val versions = mavenRepository.versions(coordinate)
+			debug.log { "$coordinate $versions" }
 
 			if (version in versions) {
 				break
@@ -31,7 +31,7 @@ class DependencyWatch(
 			delay(checkInterval)
 		}
 
-		notifier.notify(groupId, artifactId, version)
+		notifier.notify(coordinate, version)
 	}
 
 	suspend fun monitor(config: Path): Nothing {
@@ -42,20 +42,15 @@ class DependencyWatch(
 
 			supervisorScope {
 				for (coordinates in parsedConfig.coordinates) {
-					val (groupId, artifactId, version) = parseCoordinates(coordinates)
-					check(version == null) {
-						"Coordinate version must not be specified: '$coordinates'"
-					}
-
 					launch(start = UNDISPATCHED) {
-						debug.log { "Fetching metadata for $groupId:$artifactId..."  }
-						val versions = mavenRepository.versions(groupId, artifactId)
-						debug.log { "$groupId:$artifactId $versions" }
+						debug.log { "Fetching metadata for $coordinates..."  }
+						val versions = mavenRepository.versions(coordinates)
+						debug.log { "$coordinates $versions" }
 
 						for (mavenVersion in versions) {
-							if (!database.coordinatesSeen(groupId, artifactId, mavenVersion)) {
-								database.markCoordinatesSeen(groupId, artifactId, mavenVersion)
-								notifier.notify(groupId, artifactId, mavenVersion)
+							if (!database.coordinatesSeen(coordinates, mavenVersion)) {
+								database.markCoordinatesSeen(coordinates, mavenVersion)
+								notifier.notify(coordinates, mavenVersion)
 							}
 						}
 					}
@@ -69,6 +64,6 @@ class DependencyWatch(
 
 	@Serializable
 	private data class Config(
-		val coordinates: List<String>,
+		val coordinates: List<MavenCoordinate>,
 	)
 }

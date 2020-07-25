@@ -94,13 +94,13 @@ private class AwaitCommand : DependencyWatchCommand(
 	override suspend fun execute(
 		dependencyWatch: DependencyWatch,
 	) {
-		val (groupId, artifactId, version) = parseCoordinates(coordinates)
+		val (coordinate, version) = parseCoordinates(coordinates)
 		checkNotNull(version) {
 			"Coordinate version must be present and non-empty: '$coordinates'"
 		}
-		debug.log { "$groupId:$artifactId:$version" }
+		debug.log { "$coordinate $version" }
 
-		dependencyWatch.await(groupId, artifactId, version)
+		dependencyWatch.await(coordinate, version)
 	}
 }
 

@@ -5,10 +5,9 @@ class RecordingNotifier : Notifier {
   val notifications: List<String> = _notifications
 
   override suspend fun notify(
-    groupId: String,
-    artifactId: String,
-    version: String
+    coordinate: MavenCoordinate,
+    version: String,
   ) {
-    _notifications += "$groupId:$artifactId:$version"
+    _notifications += "${coordinate.groupId}:${coordinate.artifactId}:$version"
   }
 }

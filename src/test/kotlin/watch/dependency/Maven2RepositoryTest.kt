@@ -35,7 +35,7 @@ class Maven2RepositoryTest {
 				|</metadata>
 				|""".trimMargin()))
 
-		val versions = repository.versions("com.example", "example")
+		val versions = repository.versions(MavenCoordinate("com.example", "example"))
 		assertThat(versions).containsExactly(
 			"1.0.0-alpha1",
 			"1.0.0-alpha2",

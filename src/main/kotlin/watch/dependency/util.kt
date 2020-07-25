@@ -41,7 +41,7 @@ suspend fun Call.await(): String {
 	}
 }
 
-fun parseCoordinates(coordinates: String): Triple<String, String, String?> {
+fun parseCoordinates(coordinates: String): Pair<MavenCoordinate, String?> {
 	val firstColon = coordinates.indexOf(':')
 	check(firstColon > 0) {
 		"Coordinate ':' must be present and after non-empty groupId: '$coordinates'"
@@ -53,7 +53,7 @@ fun parseCoordinates(coordinates: String): Triple<String, String, String?> {
 		check(firstColon < coordinates.length) {
 			"Coordinate artifactId must be non-empty: '$coordinates'"
 		}
-		return Triple(groupId, coordinates.substring(firstColon + 1), null)
+		return MavenCoordinate(groupId, coordinates.substring(firstColon + 1)) to null
 	}
 	check(secondColon > firstColon + 1) {
 		"Coordinate artifactId must be non-empty: '$coordinates'"
@@ -65,5 +65,5 @@ fun parseCoordinates(coordinates: String): Triple<String, String, String?> {
 	}
 	val version = coordinates.substring(secondColon + 1)
 
-	return Triple(groupId, artifactId, version)
+	return MavenCoordinate(groupId, artifactId) to version
 }

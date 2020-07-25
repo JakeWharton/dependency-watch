@@ -15,7 +15,7 @@ class IftttNotifierTest {
 		val notifier = IftttNotifier(OkHttpClient(), server.url("/"))
 
 		server.enqueue(MockResponse())
-		notifier.notify("com.example", "example", "1.1.0")
+		notifier.notify(MavenCoordinate("com.example", "example"), "1.1.0")
 
 		val request = server.takeRequest()
 		assertThat(request.body.readUtf8())
