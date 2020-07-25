@@ -40,24 +40,33 @@ Commands:
 ```
 ```
 $ dependency-watch await --help
-Usage: dependency-watch await [OPTIONS] coordinates
+Usage: dependency-watch await [OPTIONS] COORDINATES
 
   Wait for an artifact to appear on Maven central then exit
 
 Options:
-  -h, --help  Show this message and exit
+  --interval DURATION  Amount of time between checks (ISO8601 duration format,
+                       default 1 minute)
+  --ifttt URL          IFTTT webhook URL to trigger (see
+                       https://ifttt.com/maker_webhooks)
+  -h, --help           Show this message and exit
 
 Arguments:
-  coordinates  Maven coordinates (e.g., 'com.example:example:1.0.0')
+  COORDINATES  Maven coordinates (e.g., 'com.example:example:1.0.0')
 ```
 ```
 $ dependency-watch monitor --help
-Usage: dependency-watch monitor [OPTIONS] config
+Usage: dependency-watch monitor [OPTIONS] CONFIG
 
   Constantly monitor Maven coordinates for new versions
 
 Options:
-  -h, --help  Show this message and exit
+  --interval DURATION  Amount of time between checks (ISO8601 duration format,
+                       default 1 minute)
+  --ifttt URL          IFTTT webhook URL to trigger (see
+                       https://ifttt.com/maker_webhooks)
+  --watch              Continually monitor for new versions every '--interval'
+  -h, --help           Show this message and exit
 ```
 
 

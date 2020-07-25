@@ -96,7 +96,7 @@ private class AwaitCommand : DependencyWatchCommand(
 	name = "await",
 	help = "Wait for an artifact to appear on Maven central then exit",
 ) {
-	private val coordinates by argument("coordinates", help = "Maven coordinates (e.g., 'com.example:example:1.0.0')")
+	private val coordinates by argument("COORDINATES", help = "Maven coordinates (e.g., 'com.example:example:1.0.0')")
 
 	override suspend fun execute(
 		dependencyWatch: DependencyWatch,
@@ -117,7 +117,7 @@ private class MonitorCommand(
 	name = "monitor",
 	help = "Constantly monitor Maven coordinates for new versions",
 ) {
-	private val config by argument("config").path(fs)
+	private val config by argument("CONFIG").path(fs)
 	private val watch by option("--watch").flag()
 		.copy(help = "Continually monitor for new versions every '--interval'")
 
