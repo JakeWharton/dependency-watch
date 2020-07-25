@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.defaultLazy
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
@@ -40,6 +41,11 @@ private abstract class DependencyWatchCommand(
 	protected val debug by option(hidden = true)
 		.switch<Debug>(mapOf("--debug" to Debug.Console))
 		.default(Debug.Disabled)
+	private val database by option("--data", metavar = "PATH")
+		.copy(help = "Directory into which already-seen versions are tracked (default in-memory)")
+		.path(canBeFile = false)
+		.convert { FileSystemDatabase(it) as Database }
+		.defaultLazy { InMemoryDatabase() }
 	private val checkInterval by option("--interval", metavar = "DURATION")
 		.copy(help = "Amount of time between checks (ISO8601 duration format, default 1 minute)")
 		.convert { Duration.parse(it).toKotlinDuration() }
@@ -73,7 +79,7 @@ private abstract class DependencyWatchCommand(
 
 		val app = DependencyWatch(
 			mavenRepository = mavenCentral,
-			database = InMemoryDatabase(),
+			database = database,
 			notifier = notifier,
 			checkInterval = checkInterval,
 			debug = debug,
