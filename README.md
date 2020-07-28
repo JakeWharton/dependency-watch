@@ -83,7 +83,7 @@ the ID to the container using the `HEALTHCHECK_ID` environment variable.
 ```yaml
 version: '2'
 services:
-  mbsync:
+  dependency-watch:
     image: jakewharton/dependency-watch:trunk
     restart: unless-stopped
     volumes:
