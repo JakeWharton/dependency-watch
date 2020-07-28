@@ -4,7 +4,7 @@ if [ -n "$HEALTHCHECK_ID" ]; then
 	curl -sS -X POST -o /dev/null "$HEALTHCHECK_HOST/$HEALTHCHECK_ID/start"
 fi
 
-# If gitout fails we want to avoid triggering the health check.
+# If the binary fails we want to avoid triggering the health check.
 set -e
 
 KNOWN_ARGS=""
@@ -18,6 +18,9 @@ fi
 	$KNOWN_ARGS \
 	$DEPENDENCY_WATCH_ARGS \
 	/config/*.yaml
+
+# Print something since the script otherwise has no output if nothing changes.
+echo "Check complete!"
 
 if [ -n "$HEALTHCHECK_ID" ]; then
 	curl -sS -X POST -o /dev/null --fail "$HEALTHCHECK_HOST/$HEALTHCHECK_ID"
