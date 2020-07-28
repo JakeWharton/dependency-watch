@@ -36,7 +36,7 @@ ENV \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     CRON="" \
     HEALTHCHECK_ID="" \
-    HEALTHCHECK_HOST="https://hc-ping.com/" \
+    HEALTHCHECK_HOST="https://hc-ping.com" \
     PUID="" \
     PGID="" \
     NOTIFY_IFTTT="" \
