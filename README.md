@@ -55,10 +55,10 @@ Arguments:
   COORDINATES  Maven coordinates (e.g., 'com.example:example:1.0.0')
 ```
 ```
-$ dependency-watch monitor --help
-Usage: dependency-watch monitor [OPTIONS] CONFIG
+$ dependency-watch notify --help
+Usage: dependency-watch notify [OPTIONS] CONFIG
 
-  Constantly monitor Maven coordinates for new versions
+  Monitor Maven coordinates for new versions
 
 Options:
   --interval DURATION  Amount of time between checks (ISO8601 duration format,

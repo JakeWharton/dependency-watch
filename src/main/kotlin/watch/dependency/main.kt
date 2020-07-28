@@ -29,7 +29,7 @@ fun main(vararg args: String) {
 	NoOpCliktCommand(name = "dependency-watch")
 		.subcommands(
 			AwaitCommand(),
-			MonitorCommand(FileSystems.getDefault()),
+			NotifyCommand(FileSystems.getDefault()),
 		)
 		.main(args)
 }
@@ -120,11 +120,11 @@ private class AwaitCommand : DependencyWatchCommand(
 	}
 }
 
-private class MonitorCommand(
+private class NotifyCommand(
 	fs: FileSystem
 ) : DependencyWatchCommand(
-	name = "monitor",
-	help = "Constantly monitor Maven coordinates for new versions",
+	name = "notify",
+	help = "Monitor Maven coordinates for new versions",
 ) {
 	private val config by argument("CONFIG").path(fs)
 
@@ -134,6 +134,6 @@ private class MonitorCommand(
 	override suspend fun execute(
 		dependencyWatch: DependencyWatch,
 	) {
-		dependencyWatch.monitor(config, watch)
+		dependencyWatch.notify(config, watch)
 	}
 }

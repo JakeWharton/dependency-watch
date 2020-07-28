@@ -33,7 +33,7 @@ class DependencyWatch(
 		notifier.notify(coordinate, version)
 	}
 
-	suspend fun monitor(config: Path, watch: Boolean = false) {
+	suspend fun notify(config: Path, watch: Boolean = false) {
 		while (true) {
 			// Parse the config inside the loop so you can edit while running.
 			val parsedConfig = Yaml.default.parse(Config.serializer(), config.readText())

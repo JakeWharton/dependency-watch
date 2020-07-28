@@ -49,14 +49,14 @@ class DependencyWatchTest {
 		""".trimMargin())
 
 		withTimeout(1.seconds) {
-			app.monitor(config)
+			app.notify(config)
 		}
 		assertThat(notifier.notifications).isEmpty()
 
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 
 		withTimeout(1.seconds) {
-			app.monitor(config)
+			app.notify(config)
 		}
 		assertThat(notifier.notifications).containsExactly(
 			"com.example:example-a:1.0",
@@ -72,7 +72,7 @@ class DependencyWatchTest {
 
 		// Start undispatched to immediately trigger first check.
 		val monitorJob = launch(start = UNDISPATCHED) {
-			app.monitor(config, watch = true)
+			app.notify(config, watch = true)
 			fail()
 		}
 
@@ -99,7 +99,7 @@ class DependencyWatchTest {
 
 		// Start undispatched to immediately trigger first check.
 		val monitorJob = launch(start = UNDISPATCHED) {
-			app.monitor(config, watch = true)
+			app.notify(config, watch = true)
 			fail()
 		}
 
