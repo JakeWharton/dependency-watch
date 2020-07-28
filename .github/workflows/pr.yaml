@@ -1,6 +1,6 @@
 name: build
 
-on: [push, pull_request]
+on: [pull_request]
 
 env:
   GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false -Dkotlin.incremental=false"
@@ -16,10 +16,5 @@ jobs:
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
 
-      - name: Configure JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-
-      - name: Assemble and Test
-        run: ./gradlew build
+      - name: Build
+        run: docker build .

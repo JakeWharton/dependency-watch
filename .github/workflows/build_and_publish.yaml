@@ -1,0 +1,28 @@
+name: build and publish
+
+on:
+  push:
+    branches:
+      - trunk
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Build and Publish
+        uses: docker/build-push-action@v1
+        with:
+          username: jakewharton
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          repository: jakewharton/dependency-watch
+          tag_with_ref: true
+          add_git_labels: true
