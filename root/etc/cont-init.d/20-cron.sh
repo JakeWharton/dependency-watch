@@ -19,12 +19,6 @@ ERROR: '/config' directory must be mounted
 "
 	exit 1
 fi
-if [ ! -f /config/config.yaml ]; then
-	echo "
-ERROR: '/config/config.yaml' file must exist
-"
-	exit 1
-fi
 
 if [ -z "$HEALTHCHECK_ID" ]; then
 	echo "
