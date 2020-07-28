@@ -60,6 +60,12 @@ run `bin/dependency-watch` or `bin/dependency-watch.bat`.
 
 The container runs the tool using cron on a specified schedule and will notify IFTTT.
 
+[![Docker Image Version](https://img.shields.io/docker/v/jakewharton/dependency-watch?sort=semver)][hub]
+[![Docker Image Size](https://img.shields.io/docker/image-size/jakewharton/dependency-watch)][layers]
+
+ [hub]: https://hub.docker.com/r/jakewharton/dependency-watch/
+ [layers]: https://microbadger.com/images/jakewharton/dependency-watch
+
 ```
 $ docker run -it --rm
     -v /path/to/config:/config \
