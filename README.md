@@ -10,6 +10,37 @@ $ dependency-watch await com.example:example:1.1.0 | say "Example 1.1.0 is avail
 
 Pipe to a notification, email, HTTP request, sound, or anything else your heart desires.
 
+### Monitor
+
+The `notify` subcommand allows you to monitor multiple groupId/artifactId coordinates at once.
+
+Create a `config.yaml` with a coordinate list.
+```yaml
+coordinates:
+ - com.example:example
+ - com.jakewharton:dependency-watch
+```
+
+Pass the config file and a `--data` directory to store already-seen versions:
+```
+$ dependency-watch notify --data data config.yaml
+```
+
+This will check for any new versions once and then exist. Run with `--watch` to continuously check
+every minute. Use `--interval` to adjust the check period.
+
+### IFTTT
+
+Both the `await` and `notify` subcommands print new versions to the console. The `--ifttt` option
+accepts an [IFTTT webhook URL](https://ifttt.com/maker_webhooks) to notify when a new version is
+found. This notification can then be redirected to Twitter, Slack, email, printers,
+light bulbs, and hundreds of other places.
+
+The event will have the following data set:
+ - `Value1`: The groupId:artifactId pair (e.g., `com.example:example`)
+ - `Value2`: The new versions that was seen (e.g., `1.1.0`)
+ - `Value3`: Not used
+
 
 ## Install
 
@@ -24,6 +55,42 @@ $ brew install JakeWharton/repo/dependency-watch
 Download ZIP from [latest release](https://github.com/JakeWharton/dependency-watch/releases/latest) and
 run `bin/dependency-watch` or `bin/dependency-watch.bat`.
 
+
+## Docker
+
+The container runs the tool using cron on a specified schedule and will notify IFTTT.
+
+```
+$ docker run -it --rm
+    -v /path/to/config:/config \
+    -v /path/to/data:/data \
+    -e "CRON=0 * * * *" \
+    -e "NOTIFY_IFTTT=..." \
+    jakewharton/dependency-watch:trunk
+```
+
+To be notified when sync is failing visit https://healthchecks.io, create a check, and specify
+the ID to the container using the `HEALTHCHECK_ID` environment variable.
+
+### Docker Compose
+
+```yaml
+version: '2'
+services:
+  mbsync:
+    image: jakewharton/dependency-watch:trunk
+    restart: unless-stopped
+    volumes:
+      - /path/to/config:/config
+      - /path/to/data:/data
+    environment:
+      - "CRON=0 * * * *"
+      - "NOTIFY_IFTTT=..."
+      #Optional:
+      - "HEALTHCHECK_ID=..."
+      - "PUID=..."
+      - "PGID=..."
+```
 
 ## Usage
 
