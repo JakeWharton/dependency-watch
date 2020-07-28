@@ -31,6 +31,12 @@ if [ -z "$HEALTHCHECK_ID" ]; then
 NOTE: Define HEALTHCHECK_ID with https://healthchecks.io to monitor sync job"
 fi
 
+if [ -z "NOTIFY_IFTTT" ]; then
+	echo "
+ERROR: 'NOTIFY_IFTTT' environment variable not set"
+	exit 1
+fi
+
 # Set up the cron schedule.
 echo "
 Initializing cron
