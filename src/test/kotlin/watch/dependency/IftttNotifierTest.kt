@@ -12,7 +12,8 @@ class IftttNotifierTest {
 	@get:Rule val server = MockWebServer()
 
 	@Test fun simple() = runBlocking {
-		val notifier = IftttNotifier(OkHttpClient(), server.url("/"))
+		val serverUrl = server.url("/")
+		val notifier = IftttNotifier(OkHttpClient(), serverUrl)
 
 		server.enqueue(MockResponse())
 		notifier.notify(MavenCoordinate("com.example", "example"), "1.1.0")
@@ -20,5 +21,6 @@ class IftttNotifierTest {
 		val request = server.takeRequest()
 		assertThat(request.body.readUtf8())
 			.isEqualTo("""{"value1":"com.example:example","value2":"1.1.0"}""")
+		assertThat(request.requestUrl).isEqualTo(serverUrl)
 	}
 }
