@@ -129,7 +129,7 @@ Arguments:
 ```
 ```
 $ dependency-watch notify --help
-Usage: dependency-watch notify [OPTIONS] CONFIG
+Usage: dependency-watch notify [OPTIONS] [CONFIG]...
 
   Monitor Maven coordinates for new versions
 

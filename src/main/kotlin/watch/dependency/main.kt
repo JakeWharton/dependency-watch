@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.NoOpCliktCommand
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.defaultLazy
@@ -13,6 +14,8 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
 import com.github.ajalt.clikt.parameters.types.path
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
@@ -126,7 +129,9 @@ private class NotifyCommand(
 	name = "notify",
 	help = "Monitor Maven coordinates for new versions",
 ) {
-	private val config by argument("CONFIG").path(fs)
+	private val configs by argument("CONFIG")
+		.path(fs)
+		.multiple(required = true)
 
 	private val watch by option("--watch").flag()
 		.copy(help = "Continually monitor for new versions every '--interval'")
@@ -134,6 +139,12 @@ private class NotifyCommand(
 	override suspend fun execute(
 		dependencyWatch: DependencyWatch,
 	) {
-		dependencyWatch.notify(config, watch)
+		coroutineScope {
+			for (config in configs) {
+				launch {
+					dependencyWatch.notify(config, watch)
+				}
+			}
+		}
 	}
 }

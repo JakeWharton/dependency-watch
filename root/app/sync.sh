@@ -17,7 +17,7 @@ fi
 	--data /data \
 	$KNOWN_ARGS \
 	$DEPENDENCY_WATCH_ARGS \
-	/config/config.yaml
+	/config/*.yaml
 
 if [ -n "$HEALTHCHECK_ID" ]; then
 	curl -sS -X POST -o /dev/null --fail "$HEALTHCHECK_HOST/$HEALTHCHECK_ID"
