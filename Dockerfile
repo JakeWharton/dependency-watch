@@ -26,6 +26,7 @@ FROM oznu/s6-alpine:3.11
 LABEL maintainer="Jake Wharton <docker@jakewharton.com>"
 
 RUN apk add --no-cache \
+      curl \
       openjdk8-jre \
  && rm -rf /var/cache/* \
  && mkdir /var/cache/apk
