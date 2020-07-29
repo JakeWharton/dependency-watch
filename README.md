@@ -118,10 +118,14 @@ Usage: dependency-watch await [OPTIONS] COORDINATES
   Wait for an artifact to appear on Maven central then exit
 
 Options:
+  --data PATH          Directory into which already-seen versions are tracked
+                       (default in-memory)
   --interval DURATION  Amount of time between checks (ISO8601 duration format,
                        default 1 minute)
   --ifttt URL          IFTTT webhook URL to trigger (see
                        https://ifttt.com/maker_webhooks)
+  --repo URL           URL of maven repository to check (default is Maven
+                       Central)
   -h, --help           Show this message and exit
 
 Arguments:
@@ -134,10 +138,14 @@ Usage: dependency-watch notify [OPTIONS] [CONFIG]...
   Monitor Maven coordinates for new versions
 
 Options:
+  --data PATH          Directory into which already-seen versions are tracked
+                       (default in-memory)
   --interval DURATION  Amount of time between checks (ISO8601 duration format,
                        default 1 minute)
   --ifttt URL          IFTTT webhook URL to trigger (see
                        https://ifttt.com/maker_webhooks)
+  --repo URL           URL of maven repository to check (default is Maven
+                       Central)
   --watch              Continually monitor for new versions every '--interval'
   -h, --help           Show this message and exit
 ```

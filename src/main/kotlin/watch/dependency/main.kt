@@ -60,6 +60,11 @@ private abstract class DependencyWatchCommand(
 		.copy(help = "IFTTT webhook URL to trigger (see https://ifttt.com/maker_webhooks)")
 		.convert { it.toHttpUrl() }
 
+	private val repoUrl by option("--repo", metavar = "URL")
+		.copy(help = "URL of maven repository to check (default is Maven Central)")
+		.convert { it.toHttpUrl() }
+		.default("https://repo1.maven.org/maven2/".toHttpUrl())
+
 	final override fun run() = runBlocking {
 		val okhttp = OkHttpClient.Builder()
 			.apply {
@@ -73,8 +78,7 @@ private abstract class DependencyWatchCommand(
 			}
 			.build()
 
-		val mavenCentralUrl = "https://repo1.maven.org/maven2/".toHttpUrl()
-		val mavenCentral = Maven2Repository(okhttp, mavenCentralUrl)
+		val mavenRepository = Maven2Repository(okhttp, repoUrl)
 
 		val notifier = buildList {
 			add(ConsoleNotifier)
@@ -84,7 +88,7 @@ private abstract class DependencyWatchCommand(
 		}.flatten()
 
 		val app = DependencyWatch(
-			mavenRepository = mavenCentral,
+			mavenRepository = mavenRepository,
 			database = database,
 			notifier = notifier,
 			checkInterval = checkInterval,
