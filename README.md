@@ -120,8 +120,8 @@ Usage: dependency-watch await [OPTIONS] COORDINATES
 Options:
   --data PATH          Directory into which already-seen versions are tracked
                        (default in-memory)
-  --interval DURATION  Amount of time between checks (ISO8601 duration format,
-                       default 1 minute)
+  --interval DURATION  Amount of time between checks in ISO8601 duration
+                       format (default 1 minute)
   --ifttt URL          IFTTT webhook URL to trigger (see
                        https://ifttt.com/maker_webhooks)
   --repo URL           URL of maven repository to check (default is Maven
@@ -140,8 +140,8 @@ Usage: dependency-watch notify [OPTIONS] [CONFIG]...
 Options:
   --data PATH          Directory into which already-seen versions are tracked
                        (default in-memory)
-  --interval DURATION  Amount of time between checks (ISO8601 duration format,
-                       default 1 minute)
+  --interval DURATION  Amount of time between checks in ISO8601 duration
+                       format (default 1 minute)
   --ifttt URL          IFTTT webhook URL to trigger (see
                        https://ifttt.com/maker_webhooks)
   --repo URL           URL of maven repository to check (default is Maven

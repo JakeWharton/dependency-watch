@@ -52,7 +52,7 @@ private abstract class DependencyWatchCommand(
 		.defaultLazy { InMemoryDatabase() }
 
 	private val checkInterval by option("--interval", metavar = "DURATION")
-		.copy(help = "Amount of time between checks (ISO8601 duration format, default 1 minute)")
+		.copy(help = "Amount of time between checks in ISO8601 duration format (default 1 minute)")
 		.convert { Duration.parse(it).toKotlinDuration() }
 		.default(1.minutes)
 
