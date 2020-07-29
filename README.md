@@ -148,6 +148,15 @@ Options:
                        Central)
   --watch              Continually monitor for new versions every '--interval'
   -h, --help           Show this message and exit
+
+Arguments:
+  CONFIG  YAML file containing list of coordinates to watch
+
+          Format:
+
+          coordinates:
+           - com.example.ping:pong
+           - com.example.fizz:buzz
 ```
 
 

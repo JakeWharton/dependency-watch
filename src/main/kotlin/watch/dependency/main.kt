@@ -134,6 +134,17 @@ private class NotifyCommand(
 	help = "Monitor Maven coordinates for new versions",
 ) {
 	private val configs by argument("CONFIG")
+		.copy(help = """
+			|YAML file containing list of coordinates to watch
+			|
+			|Format:
+			|
+			|```
+			|coordinates:
+			| - com.example.ping:pong
+			| - com.example.fizz:buzz
+			|```
+			|""".trimMargin())
 		.path(fs)
 		.multiple(required = true)
 
