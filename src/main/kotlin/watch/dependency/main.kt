@@ -24,9 +24,10 @@ import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC
 import okhttp3.logging.HttpLoggingInterceptor.Logger
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
-import java.time.Duration
+import kotlin.time.Duration
 import kotlin.time.minutes
 import kotlin.time.toKotlinDuration
+import java.time.Duration as JavaTimeDuration
 
 fun main(vararg args: String) {
 	NoOpCliktCommand(name = "dependency-watch")
@@ -45,15 +46,9 @@ private abstract class DependencyWatchCommand(
 		.switch<Debug>(mapOf("--debug" to Debug.Console))
 		.default(Debug.Disabled)
 
-	private val database by option("--data", metavar = "PATH")
-		.copy(help = "Directory into which already-seen versions are tracked (default in-memory)")
-		.path(canBeFile = false)
-		.convert { FileSystemDatabase(it) as Database }
-		.defaultLazy { InMemoryDatabase() }
-
 	private val checkInterval by option("--interval", metavar = "DURATION")
 		.copy(help = "Amount of time between checks in ISO8601 duration format (default 1 minute)")
-		.convert { Duration.parse(it).toKotlinDuration() }
+		.convert { JavaTimeDuration.parse(it).toKotlinDuration() }
 		.default(1.minutes)
 
 	private val ifttt by option("--ifttt", metavar = "URL")
@@ -87,16 +82,8 @@ private abstract class DependencyWatchCommand(
 			}
 		}.flatten()
 
-		val app = DependencyWatch(
-			mavenRepository = mavenRepository,
-			database = database,
-			notifier = notifier,
-			checkInterval = checkInterval,
-			debug = debug,
-		)
-
 		try {
-			execute(app)
+			execute(mavenRepository, notifier, checkInterval, debug)
 		} finally {
 			okhttp.dispatcher.executorService.shutdown()
 			okhttp.connectionPool.evictAll()
@@ -104,7 +91,10 @@ private abstract class DependencyWatchCommand(
 	}
 
 	protected abstract suspend fun execute(
-		dependencyWatch: DependencyWatch,
+		mavenRepository: MavenRepository,
+		notifier: Notifier,
+		checkInterval: Duration,
+		debug: Debug,
 	)
 }
 
@@ -115,7 +105,10 @@ private class AwaitCommand : DependencyWatchCommand(
 	private val coordinates by argument("COORDINATES", help = "Maven coordinates (e.g., 'com.example:example:1.0.0')")
 
 	override suspend fun execute(
-		dependencyWatch: DependencyWatch,
+		mavenRepository: MavenRepository,
+		notifier: Notifier,
+		checkInterval: Duration,
+		debug: Debug,
 	) {
 		val (coordinate, version) = parseCoordinates(coordinates)
 		checkNotNull(version) {
@@ -123,7 +116,13 @@ private class AwaitCommand : DependencyWatchCommand(
 		}
 		debug.log { "$coordinate $version" }
 
-		dependencyWatch.await(coordinate, version)
+		val app = DependencyAwait(
+			mavenRepository = mavenRepository,
+			notifier = notifier,
+			checkInterval = checkInterval,
+			debug = debug,
+		)
+		app.await(coordinate, version)
 	}
 }
 
@@ -148,16 +147,32 @@ private class NotifyCommand(
 		.path(fs)
 		.multiple(required = true)
 
+	private val database by option("--data", metavar = "PATH")
+		.copy(help = "Directory into which already-seen versions are tracked (default in-memory)")
+		.path(canBeFile = false)
+		.convert { FileSystemDatabase(it) as Database }
+		.defaultLazy { InMemoryDatabase() }
+
 	private val watch by option("--watch").flag()
 		.copy(help = "Continually monitor for new versions every '--interval'")
 
 	override suspend fun execute(
-		dependencyWatch: DependencyWatch,
+		mavenRepository: MavenRepository,
+		notifier: Notifier,
+		checkInterval: Duration,
+		debug: Debug,
 	) {
+		val app = DependencyNotify(
+			mavenRepository = mavenRepository,
+			database = database,
+			notifier = notifier,
+			checkInterval = checkInterval,
+			debug = debug,
+		)
 		coroutineScope {
 			for (config in configs) {
 				launch {
-					dependencyWatch.notify(config, watch)
+					app.notify(config, watch)
 				}
 			}
 		}

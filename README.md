@@ -118,8 +118,6 @@ Usage: dependency-watch await [OPTIONS] COORDINATES
   Wait for an artifact to appear on Maven central then exit
 
 Options:
-  --data PATH          Directory into which already-seen versions are tracked
-                       (default in-memory)
   --interval DURATION  Amount of time between checks in ISO8601 duration
                        format (default 1 minute)
   --ifttt URL          IFTTT webhook URL to trigger (see

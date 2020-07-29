@@ -9,30 +9,13 @@ import kotlinx.serialization.Serializable
 import java.nio.file.Path
 import kotlin.time.Duration
 
-class DependencyWatch(
+class DependencyNotify(
 	private val mavenRepository: MavenRepository,
 	private val database: Database,
 	private val notifier: Notifier,
 	private val checkInterval: Duration,
 	private val debug: Debug = Debug.Disabled,
 ) {
-	suspend fun await(coordinate: MavenCoordinate, version: String) {
-		while (true) {
-			debug.log { "Fetching metadata for $coordinate..."  }
-			val versions = mavenRepository.versions(coordinate)
-			debug.log { "$coordinate $versions" }
-
-			if (version in versions) {
-				break
-			}
-
-			debug.log { "Sleeping $checkInterval..." }
-			delay(checkInterval)
-		}
-
-		notifier.notify(coordinate, version)
-	}
-
 	suspend fun notify(config: Path, watch: Boolean = false) {
 		while (true) {
 			// Parse the config inside the loop so you can edit while running.
