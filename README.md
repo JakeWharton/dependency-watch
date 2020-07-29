@@ -109,7 +109,7 @@ Options:
 
 Commands:
   await    Wait for an artifact to appear on Maven central then exit
-  monitor  Constantly monitor Maven coordinates for new versions
+  notify   Monitor Maven coordinates for new versions
 ```
 ```
 $ dependency-watch await --help
