@@ -5,7 +5,7 @@ versions.
 
 Just release a new artifact and want to know when you can start using it?
 ```
-$ dependency-watch await com.example:example:1.1.0 | say "Example 1.1.0 is available!"
+$ dependency-watch await com.example:example:1.1.0 && say "Example 1.1.0 is available!"
 ```
 
 Pipe to a notification, email, HTTP request, sound, or anything else your heart desires.
