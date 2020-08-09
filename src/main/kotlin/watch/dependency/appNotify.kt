@@ -29,10 +29,17 @@ class DependencyNotify(
 						val versions = mavenRepository.versions(coordinates)
 						debug.log { "$coordinates $versions" }
 
-						for (mavenVersion in versions) {
-							if (!database.coordinatesSeen(coordinates, mavenVersion)) {
-								database.markCoordinatesSeen(coordinates, mavenVersion)
-								notifier.notify(coordinates, mavenVersion)
+						if (versions != null) {
+							val notifyVersions = if (database.coordinateSeen(coordinates)) {
+								versions.all.filterNot { database.coordinateVersionSeen(coordinates, it) }
+							} else {
+								listOf(versions.latest)
+							}
+							for (mavenVersion in versions.all) {
+								database.markCoordinateVersionSeen(coordinates, mavenVersion)
+							}
+							for (version in notifyVersions) {
+								notifier.notify(coordinates, version)
 							}
 						}
 					}

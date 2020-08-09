@@ -16,6 +16,8 @@ inline fun Path.readText(): String {
 	return Files.readAllBytes(this).decodeToString()
 }
 
+class HttpException(val code: Int, message: String) : RuntimeException("$code $message")
+
 suspend fun Call.await(): String {
 	return suspendCancellableCoroutine { continuation ->
 		enqueue(object : Callback {
@@ -26,7 +28,7 @@ suspend fun Call.await(): String {
 						continuation.resume(body)
 					} else {
 						continuation.resumeWithException(
-							IOException("HTTP ${response.code} ${response.message}")
+							HttpException(response.code, response.message)
 						)
 					}
 				}

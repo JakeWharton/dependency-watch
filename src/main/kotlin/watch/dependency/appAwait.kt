@@ -19,7 +19,7 @@ class DependencyAwait(
 			val versions = mavenRepository.versions(coordinate)
 			debug.log { "$coordinate $versions" }
 
-			if (version in versions) {
+			if (versions != null && version in versions.all) {
 				break
 			}
 
