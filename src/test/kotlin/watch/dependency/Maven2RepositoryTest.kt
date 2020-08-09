@@ -7,6 +7,7 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Rule
 import org.junit.Test
+import watch.dependency.MavenRepository.Versions
 
 class Maven2RepositoryTest {
 	@get:Rule val server = MockWebServer()
@@ -36,17 +37,26 @@ class Maven2RepositoryTest {
 				|""".trimMargin()))
 
 		val versions = repository.versions(MavenCoordinate("com.example", "example"))
-		assertThat(versions).containsExactly(
-			"1.0.0-alpha1",
-			"1.0.0-alpha2",
-			"1.0.0-beta3",
-			"1.0.0-beta4",
-			"1.0.0",
-			"1.1.0",
-		)
+		assertThat(versions).isEqualTo(Versions(
+			latest = "1.1.0",
+			all = setOf(
+				"1.0.0-alpha1",
+				"1.0.0-alpha2",
+				"1.0.0-beta3",
+				"1.0.0-beta4",
+				"1.0.0",
+				"1.1.0",
+		)))
 
 		val request = server.takeRequest()
 		assertThat(request.requestUrl)
 			.isEqualTo(server.url("com/example/example/maven-metadata.xml"))
+	}
+
+	@Test fun notFoundReturnsNull() = runBlocking {
+		val repository = Maven2Repository(OkHttpClient(), server.url("/"))
+		server.enqueue(MockResponse().setResponseCode(404))
+		val version = repository.versions(MavenCoordinate("com.example", "example"))
+		assertThat(version).isNull()
 	}
 }

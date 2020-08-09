@@ -68,6 +68,70 @@ class DependencyNotifyTest {
 		monitorJob.cancel()
 	}
 
+	@Test fun monitorNotifiesLatestFirstTime() = test { context ->
+		val config = fs.resolve("config.yaml")
+		config.writeText("""
+			|coordinates:
+			| - com.example:example-a
+		""".trimMargin())
+
+		// Start undispatched to immediately trigger first check.
+		val monitorJob = launch(start = UNDISPATCHED) {
+			app.notify(config, watch = true)
+			fail()
+		}
+
+		assertThat(notifier.notifications).isEmpty()
+
+		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
+		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.1")
+		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.2")
+		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.3")
+
+		context.advanceTimeBy(5.seconds)
+		assertThat(notifier.notifications).containsExactly(
+			"com.example:example-a:1.3",
+		)
+
+		monitorJob.cancel()
+	}
+
+	@Test fun monitorNotifiesAllNewSecondTime() = test { context ->
+		val config = fs.resolve("config.yaml")
+		config.writeText("""
+			|coordinates:
+			| - com.example:example-a
+		""".trimMargin())
+
+		// Start undispatched to immediately trigger first check.
+		val monitorJob = launch(start = UNDISPATCHED) {
+			app.notify(config, watch = true)
+			fail()
+		}
+
+		assertThat(notifier.notifications).isEmpty()
+
+		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
+		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.1")
+
+		context.advanceTimeBy(5.seconds)
+		assertThat(notifier.notifications).containsExactly(
+			"com.example:example-a:1.1",
+		)
+
+		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.2")
+		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.3")
+
+		context.advanceTimeBy(5.seconds)
+		assertThat(notifier.notifications).containsExactly(
+			"com.example:example-a:1.1",
+			"com.example:example-a:1.2",
+			"com.example:example-a:1.3",
+		)
+
+		monitorJob.cancel()
+	}
+
 	@Test fun monitorReadsConfigForEachCheck() = test { context ->
 		val config = fs.resolve("config.yaml")
 		config.writeText("""

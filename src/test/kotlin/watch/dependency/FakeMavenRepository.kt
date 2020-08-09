@@ -1,18 +1,24 @@
 package watch.dependency
 
+import watch.dependency.MavenRepository.Versions
+
 class FakeMavenRepository : MavenRepository {
-	private val versions = mutableMapOf<MavenCoordinate, MutableSet<String>>()
+	private val versions = mutableMapOf<MavenCoordinate, MutableList<String>>()
 
 	fun addArtifact(
 		coordinate: MavenCoordinate,
 		version: String,
 	) {
-		versions.getOrPut(coordinate, ::LinkedHashSet).add(version)
+		versions.getOrPut(coordinate, ::ArrayList).add(version)
 	}
 
 	override suspend fun versions(
 		coordinate: MavenCoordinate,
-	): Set<String> {
-		return versions[coordinate] ?: emptySet()
+	): Versions? {
+		val coordinateVersions = versions[coordinate] ?: return null
+		return Versions(
+			latest = coordinateVersions.last(),
+			all = coordinateVersions.toSet(),
+		)
 	}
 }

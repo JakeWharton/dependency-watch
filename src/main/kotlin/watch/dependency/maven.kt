@@ -13,6 +13,7 @@ import nl.adaptivity.xmlutil.serialization.XmlSerialName
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import watch.dependency.MavenRepository.Versions
 
 @Serializable(with = MavenCoordinateSerializer::class)
 data class MavenCoordinate(
@@ -41,20 +42,35 @@ private object MavenCoordinateSerializer : KSerializer<MavenCoordinate> {
 }
 
 interface MavenRepository {
-	suspend fun versions(coordinate: MavenCoordinate): Set<String>
+	suspend fun versions(coordinate: MavenCoordinate): Versions?
+
+	data class Versions(
+		val latest: String,
+		val all: Set<String>,
+	)
 }
 
 class Maven2Repository(
 	private val okhttp: OkHttpClient,
 	private val url: HttpUrl,
 ) : MavenRepository {
-	override suspend fun versions(coordinate: MavenCoordinate): Set<String> {
+	override suspend fun versions(coordinate: MavenCoordinate): Versions? {
 		val (groupId, artifactId) = coordinate
 		val metadataUrl = url.resolve("${groupId.replace('.', '/')}/$artifactId/maven-metadata.xml")!!
 		val call = okhttp.newCall(Request.Builder().url(metadataUrl).build())
-		val body = call.await()
+		val body = try {
+			call.await()
+		} catch (e: HttpException) {
+			if (e.code == 404) {
+				return null
+			}
+			throw e
+		}
 		val metadata = xmlFormat.parse(ArtifactMetadata.serializer(), body)
-		return metadata.versioning.versions.toSet()
+		return Versions(
+			latest = metadata.versioning.release,
+			all = metadata.versioning.versions.toSet()
+		)
 	}
 
 	private companion object {
@@ -71,6 +87,8 @@ class Maven2Repository(
 	) {
 		@Serializable
 		data class Versioning(
+			@XmlChildrenName("release", "", "")
+			val release: String,
 			@XmlChildrenName("version", "", "")
 			val versions: List<String>,
 		)

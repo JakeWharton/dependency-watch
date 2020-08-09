@@ -18,10 +18,24 @@ class DatabaseTest(
 	@Test fun returnsTrueAfterMark() {
 		val exampleCoordinates = MavenCoordinate("com.example", "example")
 
-		assertFalse(database.coordinatesSeen(exampleCoordinates, "1.0.0"))
+		assertFalse(database.coordinateSeen(exampleCoordinates))
+		assertFalse(database.coordinateVersionSeen(exampleCoordinates, "1.0.0"))
 
-		database.markCoordinatesSeen(exampleCoordinates, "1.0.0")
-		assertTrue(database.coordinatesSeen(exampleCoordinates, "1.0.0"))
+		database.markCoordinateVersionSeen(exampleCoordinates, "1.0.0")
+		assertTrue(database.coordinateSeen(exampleCoordinates))
+		assertTrue(database.coordinateVersionSeen(exampleCoordinates, "1.0.0"))
+	}
+
+	@Test fun markingSeenIsIdempotent() {
+		val exampleCoordinates = MavenCoordinate("com.example", "example")
+
+		database.markCoordinateVersionSeen(exampleCoordinates, "1.0.0")
+		assertTrue(database.coordinateSeen(exampleCoordinates))
+		assertTrue(database.coordinateVersionSeen(exampleCoordinates, "1.0.0"))
+
+		database.markCoordinateVersionSeen(exampleCoordinates, "1.0.0")
+		assertTrue(database.coordinateSeen(exampleCoordinates))
+		assertTrue(database.coordinateVersionSeen(exampleCoordinates, "1.0.0"))
 	}
 
 	companion object {
