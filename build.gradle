@@ -1,18 +1,52 @@
 buildscript {
 	repositories {
 		mavenCentral()
+		gradlePluginPortal()
 	}
 	dependencies {
 		classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.10'
 		classpath 'org.jetbrains.kotlin:kotlin-serialization:1.4.10'
+		classpath 'com.palantir.graal:gradle-graal:0.7.1'
 	}
 }
 
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
+apply plugin: 'com.palantir.graal'
 apply plugin: 'application'
 
 mainClassName = 'watch.dependency.Main'
+
+graal {
+	graalVersion '20.1.0'
+	javaVersion '8'
+
+	mainClass mainClassName
+	outputName 'dependency-watch'
+
+	// Ensure we build a full standalone binary or fail.
+	option '--no-fallback'
+
+	// Include the necessary TLS bits for HTTPS connections.
+	option '--enable-https'
+
+	if (project.hasProperty('graalStatic')) {
+		option '--static'
+		option '--no-server'
+	}
+
+	// Error: com.oracle.graal.pointsto.constraints.UnsupportedFeatureException: Invoke with MethodHandle
+	// argument could not be reduced to at most a single call or single field access. The method handle
+	// must be a compile time constant, e.g., be loaded from a `static final` field. Method that contains
+	// the method handle invocation: java.lang.invoke.MethodHandle.invokeBasic(Object)
+	// Detailed message:
+	// Trace:
+	//         at parsing java.lang.invoke.LambdaForm$MH/1035095880.invoke_MT(LambdaForm$MH)
+	// Call path from entry point to java.lang.invoke.LambdaForm$MH/1035095880.invoke_MT(Object, Object, Object):
+	//         at java.lang.invoke.LambdaForm$MH/1035095880.invoke_MT(LambdaForm$MH)
+	//         at nl.adaptivity.xmlutil.StAXWriter.startDocument(StAXWriter.kt:412)
+	option '--report-unsupported-elements-at-runtime'
+}
 
 dependencies {
 	def okhttpVersion = '4.9.0'
@@ -28,6 +62,8 @@ dependencies {
 	implementation 'com.github.ajalt.clikt:clikt:3.0.1'
 	implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
 	implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
+
+	compileOnly "org.graalvm.nativeimage:svm:${graal.graalVersion.get()}"
 
 	testImplementation 'junit:junit:4.13'
 	testImplementation 'com.google.truth:truth:1.0.1'

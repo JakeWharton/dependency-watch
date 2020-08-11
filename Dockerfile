@@ -2,13 +2,20 @@ FROM adoptopenjdk:8-jdk-hotspot AS build
 ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dkotlin.incremental=false"
 WORKDIR /app
 
-COPY gradlew settings.gradle ./
+# Build config rarely changes so cache it first.
+COPY gradlew build.gradle settings.gradle ./
 COPY gradle ./gradle
-RUN ./gradlew --version
+RUN ./gradlew extractGraalTooling
 
-COPY build.gradle ./
+# Dependencies for Graal build's full static linking.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      build-essential \
+      zlib1g-dev \
+      ;
+
 COPY src ./src
-RUN ./gradlew build
+RUN ./gradlew build nativeImage -PgraalStatic
 
 
 FROM golang:alpine AS shell
@@ -25,12 +32,6 @@ RUN shfmt -d .
 FROM oznu/s6-alpine:3.11
 LABEL maintainer="Jake Wharton <docker@jakewharton.com>"
 
-RUN apk add --no-cache \
-      curl \
-      openjdk8-jre \
- && rm -rf /var/cache/* \
- && mkdir /var/cache/apk
-
 ENV \
     # Fail if cont-init scripts exit with non-zero code.
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
@@ -43,4 +44,4 @@ ENV \
     DEPENDENCY_WATCH_ARGS=""
 COPY root/ /
 WORKDIR /app
-COPY --from=build /app/build/install/dependency-watch ./
+COPY --from=build /app/build/graal/dependency-watch ./
