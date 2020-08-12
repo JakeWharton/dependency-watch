@@ -3,6 +3,14 @@
 ## [Unreleased]
 
 
+## [0.3.0] - 2020-08-12
+
+### Changed
+
+ - Only notify for the latest version when seeing a coordinate for the first time. This prevents
+   spamming notifications for all historical versions when adding coordinates to the YAML.
+
+
 ## [0.2.0] - 2020-08-06
 
 ### Added
@@ -24,6 +32,7 @@
  - Initial release
 
 
-[Unreleased]: https://github.com/JakeWharton/dependency-watch/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/JakeWharton/dependency-watch/compare/0.3.0...HEAD
+[0.3.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.3.0
 [0.2.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.2.0
 [0.1.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.1.0
