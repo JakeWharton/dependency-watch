@@ -142,6 +142,7 @@ private class NotifyCommand(
 		.path(fileSystem = fs)
 		.multiple(required = true)
 
+	@Suppress("USELESS_CAST") // Needed to keep the type abstract.
 	private val database by option("--data", metavar = "PATH")
 		.copy(help = "Directory into which already-seen versions are tracked (default in-memory)")
 		.path(canBeFile = false)

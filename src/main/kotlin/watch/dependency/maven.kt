@@ -66,7 +66,7 @@ class Maven2Repository(
 			}
 			throw e
 		}
-		val metadata = xmlFormat.parse(ArtifactMetadata.serializer(), body)
+		val metadata = xmlFormat.decodeFromString(ArtifactMetadata.serializer(), body)
 		return Versions(
 			latest = metadata.versioning.release,
 			all = metadata.versioning.versions.toSet()

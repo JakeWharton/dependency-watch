@@ -60,6 +60,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile).configureEach {
 				'-Xopt-in=kotlin.time.ExperimentalTime',
 				'-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
 				'-Xopt-in=kotlinx.coroutines.ObsoleteCoroutinesApi',
+				'-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi',
 		]
 	}
 }
