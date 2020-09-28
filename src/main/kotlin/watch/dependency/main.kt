@@ -21,7 +21,6 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC
-import okhttp3.logging.HttpLoggingInterceptor.Logger
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import kotlin.time.Duration
