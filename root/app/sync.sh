@@ -13,7 +13,7 @@ if [ -n "$NOTIFY_IFTTT" ]; then
 fi
 
 # shellcheck disable=SC2086
-/app/bin/dependency-watch notify \
+/app/dependency-watch notify \
 	--data /data \
 	$KNOWN_ARGS \
 	$DEPENDENCY_WATCH_ARGS \
