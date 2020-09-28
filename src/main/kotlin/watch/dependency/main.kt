@@ -64,11 +64,7 @@ private abstract class DependencyWatchCommand(
 		val okhttp = OkHttpClient.Builder()
 			.apply {
 				if (debug.enabled) {
-					addNetworkInterceptor(HttpLoggingInterceptor(object : Logger {
-						override fun log(message: String) {
-							debug.log { message }
-						}
-					}).setLevel(BASIC))
+					addNetworkInterceptor(HttpLoggingInterceptor(debug::log).setLevel(BASIC))
 				}
 			}
 			.build()
@@ -144,7 +140,7 @@ private class NotifyCommand(
 			| - com.example.fizz:buzz
 			|```
 			|""".trimMargin())
-		.path(fs)
+		.path(fileSystem = fs)
 		.multiple(required = true)
 
 	private val database by option("--data", metavar = "PATH")

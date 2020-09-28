@@ -59,7 +59,7 @@ class IftttNotifier(
 		val value3: String? = null
 	) {
 		fun toJson(): RequestBody {
-			val json = format.stringify(serializer(), this)
+			val json = format.encodeToString(serializer(), this)
 			return json.toRequestBody("application/json".toMediaType())
 		}
 

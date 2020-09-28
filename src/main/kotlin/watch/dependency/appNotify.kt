@@ -19,7 +19,7 @@ class DependencyNotify(
 	suspend fun notify(config: Path, watch: Boolean = false) {
 		while (true) {
 			// Parse the config inside the loop so you can edit while running.
-			val parsedConfig = Yaml.default.parse(Config.serializer(), config.readText())
+			val parsedConfig = Yaml.default.decodeFromString(Config.serializer(), config.readText())
 			debug.log { parsedConfig.toString() }
 
 			supervisorScope {
