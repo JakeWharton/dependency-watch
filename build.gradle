@@ -3,8 +3,8 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72'
-		classpath 'org.jetbrains.kotlin:kotlin-serialization:1.3.72'
+		classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.10'
+		classpath 'org.jetbrains.kotlin:kotlin-serialization:1.4.10'
 	}
 }
 
@@ -15,20 +15,24 @@ apply plugin: 'application'
 mainClassName = 'watch.dependency.Main'
 
 dependencies {
-	implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7'
-	implementation 'org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0'
-	implementation 'com.charleskorn.kaml:kaml:0.18.1'
-	implementation 'net.devrieze:xmlutil-jvm:0.20.0.1'
-	implementation 'net.devrieze:xmlutil-serialization-jvm:0.20.0.1'
-	implementation 'com.github.ajalt:clikt:2.8.0'
-	implementation 'com.squareup.okhttp3:okhttp:4.7.2'
-	implementation 'com.squareup.okhttp3:logging-interceptor:4.7.2'
+	def okhttpVersion = '4.9.0'
+	def kotlinxSerializationVersion = '1.0.0-RC2'
+	def xmlUtilVersion = '0.80.0-RC'
+
+	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9'
+	implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion"
+	implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion"
+	implementation 'com.charleskorn.kaml:kaml:0.23.0'
+	implementation "net.devrieze:xmlutil-jvm:$xmlUtilVersion"
+	implementation "net.devrieze:xmlutil-serialization-jvm:$xmlUtilVersion"
+	implementation 'com.github.ajalt.clikt:clikt:3.0.1'
+	implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
+	implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
 
 	testImplementation 'junit:junit:4.13'
 	testImplementation 'com.google.truth:truth:1.0.1'
 	testImplementation 'com.google.jimfs:jimfs:1.1'
-	testImplementation 'com.squareup.okhttp3:mockwebserver:4.7.2'
+	testImplementation "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
 }
 
 repositories {
@@ -56,7 +60,6 @@ tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile).configureEach {
 				'-Xopt-in=kotlin.time.ExperimentalTime',
 				'-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
 				'-Xopt-in=kotlinx.coroutines.ObsoleteCoroutinesApi',
-				'-Xopt-in=kotlinx.serialization.UnstableDefault',
 		]
 	}
 }
