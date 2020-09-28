@@ -32,11 +32,6 @@ RUN shfmt -d .
 FROM oznu/s6-alpine:3.11
 LABEL maintainer="Jake Wharton <docker@jakewharton.com>"
 
-RUN apk add --no-cache \
-      curl \
- && rm -rf /var/cache/* \
- && mkdir /var/cache/apk
-
 ENV \
     # Fail if cont-init scripts exit with non-zero code.
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
