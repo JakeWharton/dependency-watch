@@ -26,7 +26,7 @@ Pass the config file and a `--data` directory to store already-seen versions:
 $ dependency-watch notify --data data config.yaml
 ```
 
-This will check for any new versions once and then exist. Run with `--watch` to continuously check
+This will check for any new versions once and then exit. Run with `--watch` to continuously check
 every minute. Use `--interval` to adjust the check period.
 
 ### IFTTT
