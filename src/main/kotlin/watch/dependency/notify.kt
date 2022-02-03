@@ -10,7 +10,7 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
 interface VersionNotifier {
-	suspend fun notify(coordinate: MavenCoordinate, version: String)
+	suspend fun notify(repositoryName: String, coordinate: MavenCoordinate, version: String)
 }
 
 fun List<VersionNotifier>.flatten(): VersionNotifier {
@@ -21,17 +21,18 @@ private class CompositeVersionNotifier(
 	private val versionNotifiers: List<VersionNotifier>,
 ) : VersionNotifier {
 	override suspend fun notify(
+		repositoryName: String,
 		coordinate: MavenCoordinate,
 		version: String,
 	) {
 		for (notifier in versionNotifiers) {
-			notifier.notify(coordinate, version)
+			notifier.notify(repositoryName, coordinate, version)
 		}
 	}
 }
 
 object ConsoleVersionNotifier : VersionNotifier {
-	override suspend fun notify(coordinate: MavenCoordinate, version: String) {
+	override suspend fun notify(repositoryName: String, coordinate: MavenCoordinate, version: String) {
 		println("${coordinate.groupId}:${coordinate.artifactId}:$version")
 	}
 }
@@ -41,12 +42,14 @@ class IftttVersionNotifier(
 	private val url: HttpUrl,
 ) : VersionNotifier {
 	override suspend fun notify(
+		repositoryName: String,
 		coordinate: MavenCoordinate,
 		version: String,
 	) {
 		val body = PostBody(
-			value1 = "${coordinate.groupId}:${coordinate.artifactId}",
-			value2 = version,
+			value1 = repositoryName,
+			value2 = "${coordinate.groupId}:${coordinate.artifactId}",
+			value3 = version,
 		)
 		val call = okhttp.newCall(Request.Builder().url(url).post(body.toJson()).build())
 		call.await()

@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class DependencyAwaitTest {
-	private val mavenRepository = FakeMavenRepository()
+	private val mavenRepository = FakeMavenRepository("Repo")
 	private val notifier = RecordingVersionNotifier()
 	private val app = DependencyAwait(
 		mavenRepository = mavenRepository,
@@ -32,6 +32,6 @@ class DependencyAwaitTest {
 
 		advanceTimeBy(1.seconds)
 		runCurrent()
-		assertThat(notifier.notifications).containsExactly("com.example:example:1.0")
+		assertThat(notifier.notifications).containsExactly("Repo com.example:example:1.0")
 	}
 }

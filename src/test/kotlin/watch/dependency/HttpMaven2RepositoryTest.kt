@@ -11,10 +11,10 @@ import watch.dependency.MavenRepository.Versions
 
 class HttpMaven2RepositoryTest {
 	@get:Rule val server = MockWebServer()
+	private val repository =
+		MavenRepository.Factory.Http(OkHttpClient()).maven2("MWS", server.url("/"))
 
 	@Test fun simple() = runBlocking {
-		val repository = HttpMaven2Repository(OkHttpClient(), server.url("/"))
-
 		server.enqueue(MockResponse()
 			.setBody("""
 				|<metadata>
@@ -54,7 +54,6 @@ class HttpMaven2RepositoryTest {
 	}
 
 	@Test fun notFoundReturnsNull() = runBlocking {
-		val repository = HttpMaven2Repository(OkHttpClient(), server.url("/"))
 		server.enqueue(MockResponse().setResponseCode(404))
 		val version = repository.versions(MavenCoordinate("com.example", "example"))
 		assertThat(version).isNull()

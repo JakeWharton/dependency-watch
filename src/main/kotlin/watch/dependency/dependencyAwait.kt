@@ -27,6 +27,6 @@ class DependencyAwait(
       delay(checkInterval)
 		}
 
-		versionNotifier.notify(coordinate, version)
+		versionNotifier.notify(mavenRepository.name, coordinate, version)
 	}
 }
