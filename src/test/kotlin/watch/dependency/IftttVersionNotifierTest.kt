@@ -8,12 +8,12 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.Rule
 import org.junit.Test
 
-class IftttNotifierTest {
+class IftttVersionNotifierTest {
 	@get:Rule val server = MockWebServer()
 
 	@Test fun simple() = runBlocking {
 		val serverUrl = server.url("/")
-		val notifier = IftttNotifier(OkHttpClient(), serverUrl)
+		val notifier = IftttVersionNotifier(OkHttpClient(), serverUrl)
 
 		server.enqueue(MockResponse())
 		notifier.notify(MavenCoordinate("com.example", "example"), "1.1.0")

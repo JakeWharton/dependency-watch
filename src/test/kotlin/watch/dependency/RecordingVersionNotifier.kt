@@ -1,6 +1,6 @@
 package watch.dependency
 
-class RecordingNotifier : Notifier {
+class RecordingVersionNotifier : VersionNotifier {
   private val _notifications = mutableListOf<String>()
   val notifications: List<String> = _notifications
 

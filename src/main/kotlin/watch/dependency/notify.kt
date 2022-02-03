@@ -9,37 +9,37 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
-interface Notifier {
+interface VersionNotifier {
 	suspend fun notify(coordinate: MavenCoordinate, version: String)
 }
 
-fun List<Notifier>.flatten(): Notifier {
-	return if (size == 1) get(0) else CompositeNotifier(this)
+fun List<VersionNotifier>.flatten(): VersionNotifier {
+	return if (size == 1) get(0) else CompositeVersionNotifier(this)
 }
 
-private class CompositeNotifier(
-	private val notifiers: List<Notifier>,
-) : Notifier {
+private class CompositeVersionNotifier(
+	private val versionNotifiers: List<VersionNotifier>,
+) : VersionNotifier {
 	override suspend fun notify(
 		coordinate: MavenCoordinate,
 		version: String,
 	) {
-		for (notifier in notifiers) {
+		for (notifier in versionNotifiers) {
 			notifier.notify(coordinate, version)
 		}
 	}
 }
 
-object ConsoleNotifier : Notifier {
+object ConsoleVersionNotifier : VersionNotifier {
 	override suspend fun notify(coordinate: MavenCoordinate, version: String) {
 		println("${coordinate.groupId}:${coordinate.artifactId}:$version")
 	}
 }
 
-class IftttNotifier(
+class IftttVersionNotifier(
 	private val okhttp: OkHttpClient,
 	private val url: HttpUrl,
-) : Notifier {
+) : VersionNotifier {
 	override suspend fun notify(
 		coordinate: MavenCoordinate,
 		version: String,

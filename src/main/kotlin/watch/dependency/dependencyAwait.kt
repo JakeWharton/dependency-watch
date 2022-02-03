@@ -6,7 +6,7 @@ import watch.dependency.Debug.Disabled
 
 class DependencyAwait(
 	private val mavenRepository: MavenRepository,
-	private val notifier: Notifier,
+	private val versionNotifier: VersionNotifier,
 	private val checkInterval: Duration,
 	private val debug: Debug = Disabled,
 ) {
@@ -27,6 +27,6 @@ class DependencyAwait(
       delay(checkInterval)
 		}
 
-		notifier.notify(coordinate, version)
+		versionNotifier.notify(coordinate, version)
 	}
 }
