@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2022-02-03
+
+### Added
+
+ - Support for monitoring multiple Maven repositories at once.
+
+### Changed
+
+ - Configuration format changed from YAML to TOML in order to support multiple repositories. See
+   `README.md` for examples.
+ - IFTTT integration now sends repository name as the first value. Maven coordinate and version
+   are now the second and third value, respectively.
+
 
 ## [0.3.0] - 2020-08-12
 
@@ -32,7 +45,8 @@
  - Initial release
 
 
-[Unreleased]: https://github.com/JakeWharton/dependency-watch/compare/0.3.0...HEAD
+[Unreleased]: https://github.com/JakeWharton/dependency-watch/compare/0.4.0...HEAD
+[0.4.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.4.0
 [0.3.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.3.0
 [0.2.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.2.0
 [0.1.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.1.0
