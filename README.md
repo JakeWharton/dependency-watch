@@ -80,6 +80,8 @@ The container runs the tool using cron on a specified schedule and will notify I
  [hub]: https://hub.docker.com/r/jakewharton/dependency-watch/
  [layers]: https://microbadger.com/images/jakewharton/dependency-watch
 
+The container looks in `/config` for any `*.toml` files, but only one is supported.
+
 ```
 $ docker run -it --rm
     -v /path/to/config:/config \

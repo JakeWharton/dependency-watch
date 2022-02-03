@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [0.4.1] - 2022-02-03
+
+### Fixed
+
+ - Docker container now looks for `*.toml` files rather than old `*.yaml`.
+
+
 ## [0.4.0] - 2022-02-03
 
 ### Added
@@ -45,7 +52,8 @@
  - Initial release
 
 
-[Unreleased]: https://github.com/JakeWharton/dependency-watch/compare/0.4.0...HEAD
+[Unreleased]: https://github.com/JakeWharton/dependency-watch/compare/0.4.1...HEAD
+[0.4.1]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.4.1
 [0.4.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.4.0
 [0.3.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.3.0
 [0.2.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.2.0
