@@ -24,6 +24,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC
+import watch.dependency.DependencyNotifier.MavenRepositoryFactory
 import watch.dependency.HttpMaven2Repository.Companion.MavenCentral
 import watch.dependency.HttpMaven2Repository.Companion.parseWellKnownMavenRepositoryNameOrUrl
 
@@ -127,7 +128,7 @@ private class NotifyCommand(
 	fs: FileSystem
 ) : DependencyWatchCommand(
 	name = "notify",
-	help = "Monitor Maven coordinates in Maven Central for new versions",
+	help = "Monitor Maven coordinates in a Maven repository for new versions",
 ) {
 	private val configPath by argument("CONFIG")
 		.help("""
@@ -136,6 +137,7 @@ private class NotifyCommand(
 			|Format:
 			|
 			|```
+			|repository: https://custom.repo/  # Optional! Default: Maven Central
 			|coordinates:
 			| - com.example.ping:pong
 			| - com.example.fizz:buzz
@@ -159,9 +161,8 @@ private class NotifyCommand(
 		checkInterval: Duration,
 		debug: Debug,
 	) {
-		val mavenRepository = HttpMaven2Repository(client, MavenCentral)
 		val notifier = DependencyNotifier(
-			mavenRepository = mavenRepository,
+			mavenRepositoryFactory = MavenRepositoryFactory.Http(client),
 			database = database,
 			versionNotifier = versionNotifier,
 			configPath = configPath,

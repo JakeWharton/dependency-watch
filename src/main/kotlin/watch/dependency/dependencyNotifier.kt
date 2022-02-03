@@ -8,9 +8,11 @@ import kotlinx.coroutines.CoroutineStart.UNDISPATCHED
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import okhttp3.HttpUrl
+import okhttp3.OkHttpClient
 
 class DependencyNotifier(
-	private val mavenRepository: MavenRepository,
+	private val mavenRepositoryFactory: MavenRepositoryFactory,
 	private val database: Database,
 	private val versionNotifier: VersionNotifier,
 	private val configPath: Path,
@@ -20,6 +22,7 @@ class DependencyNotifier(
 		val config = Config.parseFromYaml(configPath.readText())
 		debug.log { config.toString() }
 
+		val mavenRepository = mavenRepositoryFactory.create(config.repository)
 		return DependencyChecker(
 			mavenRepository = mavenRepository,
 			coordinates = config.coordinates,
@@ -49,6 +52,16 @@ class DependencyNotifier(
 
 			debug.log { "Sleeping $checkInterval..." }
 			delay(checkInterval)
+		}
+	}
+
+	fun interface MavenRepositoryFactory {
+		fun create(url: HttpUrl): MavenRepository
+
+		class Http(val client: OkHttpClient) : MavenRepositoryFactory {
+			override fun create(url: HttpUrl): MavenRepository {
+				return HttpMaven2Repository(client, url)
+			}
 		}
 	}
 }

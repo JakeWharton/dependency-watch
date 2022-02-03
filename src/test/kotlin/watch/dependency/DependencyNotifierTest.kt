@@ -5,18 +5,20 @@ import com.google.common.truth.Truth.assertThat
 import kotlin.io.path.writeText
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withTimeout
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Test
+import watch.dependency.HttpMaven2Repository.Companion.MavenCentral
 
 class DependencyNotifierTest {
-	private val fs = Jimfs.newFileSystem().rootDirectory
-	private val config = fs.resolve("config.yaml")
-	private val mavenRepository = FakeMavenRepository()
+	private val config = Jimfs.newFileSystem().rootDirectory.resolve("config.yaml")
+	private val mavenRepositories = mutableMapOf<HttpUrl, FakeMavenRepository>()
 	private val versionNotifier = RecordingVersionNotifier()
 	private val notifier = DependencyNotifier(
-		mavenRepository = mavenRepository,
+		mavenRepositoryFactory = { mavenRepositories.getOrPut(it, ::FakeMavenRepository) },
 		database = InMemoryDatabase(),
 		versionNotifier = versionNotifier,
 		configPath = config,
@@ -28,16 +30,31 @@ class DependencyNotifierTest {
 			| - com.example:example-a
 		""".trimMargin())
 
-		withTimeout(1.seconds) {
-			notifier.run()
-		}
+		notifier.run()
 		assertThat(versionNotifier.notifications).isEmpty()
 
+		val mavenRepository = mavenRepositories[MavenCentral]!!
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 
-		withTimeout(1.seconds) {
-			notifier.run()
-		}
+		notifier.run()
+		assertThat(versionNotifier.notifications).containsExactly(
+			"com.example:example-a:1.0",
+		)
+	}
+
+	@Test fun customRepositoryHonored() = runBlocking<Unit> {
+		config.writeText("""
+			|repository: https://example.com/
+			|coordinates:
+			| - com.example:example-a
+		""".trimMargin())
+
+		notifier.run()
+
+		val mavenRepository = mavenRepositories["https://example.com/".toHttpUrl()]!!
+		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
+
+		notifier.run()
 		assertThat(versionNotifier.notifications).containsExactly(
 			"com.example:example-a:1.0",
 		)
@@ -56,6 +73,7 @@ class DependencyNotifierTest {
 		runCurrent()
 		assertThat(versionNotifier.notifications).isEmpty()
 
+		val mavenRepository = mavenRepositories[MavenCentral]!!
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 
 		advanceTimeBy(5.seconds)
@@ -80,6 +98,7 @@ class DependencyNotifierTest {
 		runCurrent()
 		assertThat(versionNotifier.notifications).isEmpty()
 
+		val mavenRepository = mavenRepositories[MavenCentral]!!
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.1")
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.2")
@@ -107,6 +126,7 @@ class DependencyNotifierTest {
 		runCurrent()
 		assertThat(versionNotifier.notifications).isEmpty()
 
+		val mavenRepository = mavenRepositories[MavenCentral]!!
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.1")
 
@@ -136,6 +156,8 @@ class DependencyNotifierTest {
 			| - com.example:example-a
 		""".trimMargin())
 
+		// Create and write the repo to the map so it's available on first run.
+		val mavenRepository = FakeMavenRepository().also { mavenRepositories[MavenCentral] = it }
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 
 		val monitorJob = launch {
