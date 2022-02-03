@@ -27,7 +27,7 @@ jobs:
       - run: ./gradlew build
 
       - name: Build and Publish
-        uses: docker/build-push-action@v1
+        uses: docker/build-push-action@v2.9.0
         with:
           username: jakewharton
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
