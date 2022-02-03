@@ -12,6 +12,7 @@ import nl.adaptivity.xmlutil.serialization.XML
 import nl.adaptivity.xmlutil.serialization.XmlChildrenName
 import nl.adaptivity.xmlutil.serialization.XmlSerialName
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import watch.dependency.MavenRepository.Versions
@@ -54,7 +55,7 @@ interface MavenRepository {
 	)
 }
 
-class Maven2Repository(
+class HttpMaven2Repository(
 	private val okhttp: OkHttpClient,
 	private val url: HttpUrl,
 ) : MavenRepository {
@@ -77,7 +78,18 @@ class Maven2Repository(
 		)
 	}
 
-	private companion object {
+	companion object {
+		val MavenCentral = "https://repo1.maven.org/maven2/".toHttpUrl()
+		val GoogleMaven = "https://maven.google.com/".toHttpUrl()
+
+		fun parseWellKnownMavenRepositoryNameOrUrl(value: String): HttpUrl {
+			return when (value) {
+				"MavenCentral" -> MavenCentral
+				"GoogleMaven" -> GoogleMaven
+				else -> value.toHttpUrl()
+			}
+		}
+
 		private val xmlFormat = XML {
 			unknownChildHandler = UnknownChildHandler { _, _, _, _, _ -> emptyList() }
 		}
