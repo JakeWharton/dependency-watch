@@ -142,8 +142,6 @@ Options:
                        format (default 1 minute)
   --ifttt URL          IFTTT webhook URL to trigger (see
                        https://ifttt.com/maker_webhooks)
-  --repo URL           URL of maven repository to check (default is Maven
-                       Central)
   --watch              Continually monitor for new versions every '--interval'
   -h, --help           Show this message and exit
 
@@ -152,6 +150,7 @@ Arguments:
 
           Format:
 
+          repository: https://custom.repo/  # Optional! Default: Maven Central
           coordinates:
            - com.example.ping:pong
            - com.example.fizz:buzz
