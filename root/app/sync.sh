@@ -17,7 +17,7 @@ fi
 	--data /data \
 	$KNOWN_ARGS \
 	$DEPENDENCY_WATCH_ARGS \
-	/config/*.yaml
+	/config/*.toml
 
 # Print something since the script otherwise has no output if nothing changes.
 echo "Check complete!"
