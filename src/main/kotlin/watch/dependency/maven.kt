@@ -2,11 +2,12 @@ package watch.dependency
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
 import kotlinx.serialization.descriptors.PrimitiveKind.STRING
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import nl.adaptivity.xmlutil.serialization.UnknownChildHandler
 import nl.adaptivity.xmlutil.serialization.XML
 import nl.adaptivity.xmlutil.serialization.XmlChildrenName
 import nl.adaptivity.xmlutil.serialization.XmlSerialName
@@ -31,13 +32,16 @@ data class MavenCoordinate(
 	}
 }
 
-@Serializer(forClass = MavenCoordinate::class)
 private object MavenCoordinateSerializer : KSerializer<MavenCoordinate> {
 	override val descriptor: SerialDescriptor =
 		PrimitiveSerialDescriptor("MavenCoordinateSerializer", STRING)
 
 	override fun deserialize(decoder: Decoder): MavenCoordinate {
 		return MavenCoordinate.parse(decoder.decodeString())
+	}
+
+	override fun serialize(encoder: Encoder, value: MavenCoordinate) {
+		throw UnsupportedOperationException()
 	}
 }
 
@@ -75,7 +79,7 @@ class Maven2Repository(
 
 	private companion object {
 		private val xmlFormat = XML {
-			unknownChildHandler = { _, _, _, _ -> }
+			unknownChildHandler = UnknownChildHandler { _, _, _, _, _ -> emptyList() }
 		}
 	}
 

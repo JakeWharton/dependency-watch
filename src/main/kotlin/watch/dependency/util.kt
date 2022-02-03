@@ -7,14 +7,8 @@ import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
 import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Path
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-
-inline fun Path.readText(): String {
-	return Files.readAllBytes(this).decodeToString()
-}
 
 class HttpException(val code: Int, message: String) : RuntimeException("$code $message")
 
