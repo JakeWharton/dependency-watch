@@ -7,7 +7,6 @@ import com.github.ajalt.clikt.core.NoOpCliktCommand
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.help
-import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.defaultLazy
@@ -20,8 +19,6 @@ import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
@@ -66,9 +63,9 @@ private abstract class DependencyWatchCommand(
 			.build()
 
 		val notifier = buildList {
-			add(ConsoleNotifier)
+			add(ConsoleVersionNotifier)
 			ifttt?.let { ifttt ->
-				add(IftttNotifier(okhttp, ifttt))
+				add(IftttVersionNotifier(okhttp, ifttt))
 			}
 		}.flatten()
 
@@ -82,7 +79,7 @@ private abstract class DependencyWatchCommand(
 
 	protected abstract suspend fun execute(
 		client: OkHttpClient,
-		notifier: Notifier,
+		versionNotifier: VersionNotifier,
 		checkInterval: Duration,
 		debug: Debug,
 	)
@@ -105,7 +102,7 @@ private class AwaitCommand : DependencyWatchCommand(
 
 	override suspend fun execute(
 		client: OkHttpClient,
-		notifier: Notifier,
+		versionNotifier: VersionNotifier,
 		checkInterval: Duration,
 		debug: Debug,
 	) {
@@ -118,7 +115,7 @@ private class AwaitCommand : DependencyWatchCommand(
 		val mavenRepository = HttpMaven2Repository(client, repoUrl)
 		val app = DependencyAwait(
 			mavenRepository = mavenRepository,
-			notifier = notifier,
+			versionNotifier = versionNotifier,
 			checkInterval = checkInterval,
 			debug = debug,
 		)
@@ -132,7 +129,7 @@ private class NotifyCommand(
 	name = "notify",
 	help = "Monitor Maven coordinates in Maven Central for new versions",
 ) {
-	private val configs by argument("CONFIG")
+	private val configPath by argument("CONFIG")
 		.help("""
 			|YAML file containing list of coordinates to watch
 			|
@@ -145,7 +142,6 @@ private class NotifyCommand(
 			|```
 			|""".trimMargin())
 		.path(fileSystem = fs)
-		.multiple(required = true)
 
 	@Suppress("USELESS_CAST") // Needed to keep the type abstract.
 	private val database by option("--data", metavar = "PATH")
@@ -159,24 +155,22 @@ private class NotifyCommand(
 
 	override suspend fun execute(
 		client: OkHttpClient,
-		notifier: Notifier,
+		versionNotifier: VersionNotifier,
 		checkInterval: Duration,
 		debug: Debug,
 	) {
 		val mavenRepository = HttpMaven2Repository(client, MavenCentral)
-		val app = DependencyNotify(
+		val notifier = DependencyNotifier(
 			mavenRepository = mavenRepository,
 			database = database,
-			notifier = notifier,
-			checkInterval = checkInterval,
+			versionNotifier = versionNotifier,
+			configPath = configPath,
 			debug = debug,
 		)
-		coroutineScope {
-			for (config in configs) {
-				launch {
-					app.notify(config, watch)
-				}
-			}
+		if (watch) {
+			notifier.monitor(checkInterval)
+		} else {
+			notifier.run()
 		}
 	}
 }

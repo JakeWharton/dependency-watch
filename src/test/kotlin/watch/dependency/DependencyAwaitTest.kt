@@ -9,10 +9,10 @@ import org.junit.Test
 
 class DependencyAwaitTest {
 	private val mavenRepository = FakeMavenRepository()
-	private val notifier = RecordingNotifier()
+	private val notifier = RecordingVersionNotifier()
 	private val app = DependencyAwait(
 		mavenRepository = mavenRepository,
-		notifier = notifier,
+		versionNotifier = notifier,
 		checkInterval = 5.seconds,
 	)
 

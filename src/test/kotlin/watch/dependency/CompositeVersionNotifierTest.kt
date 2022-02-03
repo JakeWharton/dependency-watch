@@ -4,17 +4,17 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
-class CompositeNotifierTest {
+class CompositeVersionNotifierTest {
 	@Test fun notifyEmpty() = runBlocking {
-		val notifier = listOf<Notifier>().flatten()
+		val versionNotifier = listOf<VersionNotifier>().flatten()
 
-		notifier.notify(MavenCoordinate("com.example", "example"), "1.0.0")
+		versionNotifier.notify(MavenCoordinate("com.example", "example"), "1.0.0")
 
 		// Nothing to test!
 	}
 
 	@Test fun notifySingle() = runBlocking<Unit> {
-		val recording = RecordingNotifier()
+		val recording = RecordingVersionNotifier()
 		val notifier = listOf(recording).flatten()
 
 		notifier.notify(MavenCoordinate("com.example", "example"), "1.0.0")
@@ -25,8 +25,8 @@ class CompositeNotifierTest {
 	}
 
 	@Test fun notifyMultiple() = runBlocking<Unit> {
-		val recording1 = RecordingNotifier()
-		val recording2 = RecordingNotifier()
+		val recording1 = RecordingVersionNotifier()
+		val recording2 = RecordingVersionNotifier()
 		val notifier = listOf(recording1, recording2).flatten()
 
 		notifier.notify(MavenCoordinate("com.example", "example"), "1.0.0")
