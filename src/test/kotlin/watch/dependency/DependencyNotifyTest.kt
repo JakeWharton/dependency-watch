@@ -2,13 +2,14 @@ package watch.dependency
 
 import com.google.common.jimfs.Jimfs
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.CoroutineStart.UNDISPATCHED
+import kotlin.io.path.writeText
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.fail
 import org.junit.Test
-import kotlin.time.seconds
 
 class DependencyNotifyTest {
 	private val fs = Jimfs.newFileSystem().rootDirectory
@@ -21,7 +22,7 @@ class DependencyNotifyTest {
 		checkInterval = 5.seconds,
 	)
 
-	@Test fun monitorRunsOnceByDefault() = runBlocking<Unit> {
+	@Test fun monitorRunsOnceByDefault() = runTest {
 		val config = fs.resolve("config.yaml")
 		config.writeText("""
 			|coordinates:
@@ -43,7 +44,7 @@ class DependencyNotifyTest {
 		)
 	}
 
-	@Test fun monitorNotifiesOnceAvailable() = test { context ->
+	@Test fun monitorNotifiesOnceAvailable() = runTest {
 		val config = fs.resolve("config.yaml")
 		config.writeText("""
 			|coordinates:
@@ -51,16 +52,18 @@ class DependencyNotifyTest {
 		""".trimMargin())
 
 		// Start undispatched to immediately trigger first check.
-		val monitorJob = launch(start = UNDISPATCHED) {
+		val monitorJob = launch {
 			app.notify(config, watch = true)
 			fail()
 		}
 
+		runCurrent()
 		assertThat(notifier.notifications).isEmpty()
 
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 
-		context.advanceTimeBy(5.seconds)
+		advanceTimeBy(5.seconds)
+		runCurrent()
 		assertThat(notifier.notifications).containsExactly(
 			"com.example:example-a:1.0",
 		)
@@ -68,7 +71,7 @@ class DependencyNotifyTest {
 		monitorJob.cancel()
 	}
 
-	@Test fun monitorNotifiesLatestFirstTime() = test { context ->
+	@Test fun monitorNotifiesLatestFirstTime() = runTest {
 		val config = fs.resolve("config.yaml")
 		config.writeText("""
 			|coordinates:
@@ -76,11 +79,12 @@ class DependencyNotifyTest {
 		""".trimMargin())
 
 		// Start undispatched to immediately trigger first check.
-		val monitorJob = launch(start = UNDISPATCHED) {
+		val monitorJob = launch {
 			app.notify(config, watch = true)
 			fail()
 		}
 
+		runCurrent()
 		assertThat(notifier.notifications).isEmpty()
 
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
@@ -88,7 +92,8 @@ class DependencyNotifyTest {
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.2")
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.3")
 
-		context.advanceTimeBy(5.seconds)
+		advanceTimeBy(5.seconds)
+		runCurrent()
 		assertThat(notifier.notifications).containsExactly(
 			"com.example:example-a:1.3",
 		)
@@ -96,7 +101,7 @@ class DependencyNotifyTest {
 		monitorJob.cancel()
 	}
 
-	@Test fun monitorNotifiesAllNewSecondTime() = test { context ->
+	@Test fun monitorNotifiesAllNewSecondTime() = runTest {
 		val config = fs.resolve("config.yaml")
 		config.writeText("""
 			|coordinates:
@@ -104,17 +109,19 @@ class DependencyNotifyTest {
 		""".trimMargin())
 
 		// Start undispatched to immediately trigger first check.
-		val monitorJob = launch(start = UNDISPATCHED) {
+		val monitorJob = launch {
 			app.notify(config, watch = true)
 			fail()
 		}
 
+		runCurrent()
 		assertThat(notifier.notifications).isEmpty()
 
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.1")
 
-		context.advanceTimeBy(5.seconds)
+		advanceTimeBy(5.seconds)
+		runCurrent()
 		assertThat(notifier.notifications).containsExactly(
 			"com.example:example-a:1.1",
 		)
@@ -122,7 +129,8 @@ class DependencyNotifyTest {
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.2")
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.3")
 
-		context.advanceTimeBy(5.seconds)
+		advanceTimeBy(5.seconds)
+		runCurrent()
 		assertThat(notifier.notifications).containsExactly(
 			"com.example:example-a:1.1",
 			"com.example:example-a:1.2",
@@ -132,7 +140,7 @@ class DependencyNotifyTest {
 		monitorJob.cancel()
 	}
 
-	@Test fun monitorReadsConfigForEachCheck() = test { context ->
+	@Test fun monitorReadsConfigForEachCheck() = runTest {
 		val config = fs.resolve("config.yaml")
 		config.writeText("""
 			|coordinates:
@@ -142,18 +150,20 @@ class DependencyNotifyTest {
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 
 		// Start undispatched to immediately trigger first check.
-		val monitorJob = launch(start = UNDISPATCHED) {
+		val monitorJob = launch {
 			app.notify(config, watch = true)
 			fail()
 		}
 
+		runCurrent()
 		assertThat(notifier.notifications).containsExactly(
 			"com.example:example-a:1.0",
 		)
 
 		// Add artifact to repo but not to config. Should not notify.
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example-b"), "2.0")
-		context.advanceTimeBy(5.seconds)
+		advanceTimeBy(5.seconds)
+		runCurrent()
 		assertThat(notifier.notifications).containsExactly(
 			"com.example:example-a:1.0",
 		)
@@ -163,7 +173,8 @@ class DependencyNotifyTest {
 			| - com.example:example-a
 			| - com.example:example-b
 		""".trimMargin())
-		context.advanceTimeBy(5.seconds)
+		advanceTimeBy(5.seconds)
+		runCurrent()
 		assertThat(notifier.notifications).containsExactly(
 			"com.example:example-a:1.0",
 			"com.example:example-b:2.0",

@@ -1,10 +1,11 @@
 package watch.dependency
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.CoroutineStart.UNDISPATCHED
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
-import kotlin.time.seconds
 
 class DependencyAwaitTest {
 	private val mavenRepository = FakeMavenRepository()
@@ -15,23 +16,22 @@ class DependencyAwaitTest {
 		checkInterval = 5.seconds,
 	)
 
-	@Test fun awaitNotifiesOncePresent() = test { context ->
-		// Start undispatched to suspend on waiting for delay.
-		launch(start = UNDISPATCHED) {
+	@Test fun awaitNotifiesOncePresent() = runTest {
+		launch {
 			app.await(MavenCoordinate("com.example", "example"), "1.0")
 		}
 
-		context.advanceTimeBy(5.seconds)
-		context.triggerActions()
+		advanceTimeBy(5.seconds)
+		runCurrent()
 		assertThat(notifier.notifications).isEmpty()
 
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example"), "1.0")
-		context.advanceTimeBy(4.seconds)
-		context.triggerActions()
+		advanceTimeBy(4.seconds)
+		runCurrent()
 		assertThat(notifier.notifications).isEmpty()
 
-		context.advanceTimeBy(1.seconds)
-		context.triggerActions()
+		advanceTimeBy(1.seconds)
+		runCurrent()
 		assertThat(notifier.notifications).containsExactly("com.example:example:1.0")
 	}
 }

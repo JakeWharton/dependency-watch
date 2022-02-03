@@ -1,7 +1,10 @@
 package watch.dependency
 
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.createFile
+import kotlin.io.path.exists
+import kotlin.io.path.notExists
 
 interface Database {
 	fun coordinateSeen(coordinate: MavenCoordinate): Boolean
@@ -36,14 +39,14 @@ class FileSystemDatabase(private val root: Path) : Database {
 	}
 
 	override fun coordinateSeen(coordinate: MavenCoordinate): Boolean {
-		return Files.exists(path(coordinate))
+		return path(coordinate).exists()
 	}
 
 	override fun coordinateVersionSeen(
 		coordinate: MavenCoordinate,
 		version: String
 	): Boolean {
-		return Files.exists(path(coordinate, version))
+		return path(coordinate, version).exists()
 	}
 
 	override fun markCoordinateVersionSeen(
@@ -51,9 +54,9 @@ class FileSystemDatabase(private val root: Path) : Database {
 		version: String
 	) {
 		val path = path(coordinate, version)
-		if (Files.notExists(path)) {
-			Files.createDirectories(path.parent)
-			Files.createFile(path)
+		if (path.notExists()) {
+			path.parent.createDirectories()
+			path.createFile()
 		}
 	}
 }

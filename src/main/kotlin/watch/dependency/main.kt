@@ -14,6 +14,10 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
 import com.github.ajalt.clikt.parameters.types.path
+import java.nio.file.FileSystem
+import java.nio.file.FileSystems
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -21,12 +25,6 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC
-import java.nio.file.FileSystem
-import java.nio.file.FileSystems
-import kotlin.time.Duration
-import kotlin.time.minutes
-import kotlin.time.toKotlinDuration
-import java.time.Duration as JavaTimeDuration
 
 fun main(vararg args: String) {
 	NoOpCliktCommand(name = "dependency-watch")
@@ -47,7 +45,7 @@ private abstract class DependencyWatchCommand(
 
 	private val checkInterval by option("--interval", metavar = "DURATION")
 		.copy(help = "Amount of time between checks in ISO8601 duration format (default 1 minute)")
-		.convert { JavaTimeDuration.parse(it).toKotlinDuration() }
+		.convert { Duration.parseIsoString(it) }
 		.default(1.minutes)
 
 	private val ifttt by option("--ifttt", metavar = "URL")

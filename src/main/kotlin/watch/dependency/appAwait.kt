@@ -1,8 +1,8 @@
 package watch.dependency
 
+import kotlin.time.Duration
 import kotlinx.coroutines.delay
 import watch.dependency.Debug.Disabled
-import kotlin.time.Duration
 
 class DependencyAwait(
 	private val mavenRepository: MavenRepository,

@@ -1,13 +1,14 @@
 package watch.dependency
 
 import com.charleskorn.kaml.Yaml
+import java.nio.file.Path
+import kotlin.io.path.readText
+import kotlin.time.Duration
 import kotlinx.coroutines.CoroutineStart.UNDISPATCHED
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.serialization.Serializable
-import java.nio.file.Path
-import kotlin.time.Duration
 
 class DependencyNotify(
 	private val mavenRepository: MavenRepository,
