@@ -14,20 +14,34 @@ Pipe to a notification, email, HTTP request, sound, or anything else your heart 
 
 The `notify` subcommand allows you to monitor multiple groupId/artifactId coordinates at once.
 
-Create a `config.yaml` with a coordinate list.
-```yaml
-coordinates:
- - com.example:example
- - com.jakewharton:dependency-watch
+Create a `config.toml` with a coordinate list.
+```toml
+[MavenCentral]
+coordinates = [
+  "com.example:example",
+  "com.jakewharton:dependency-watch",
+]
 ```
 
-Pass the config file and a `--data` directory to store already-seen versions:
+You can also monitor Google's maven repository with the table name "GoogleMaven".
+Monitor custom repositories by adding a 'host' key and optional 'name'.
+
+```toml
+[CustomRepo]
+name = "Custom Repo" # Optional!
+host = "https://example.com/repo/"
+coordinates = [
+  "com.example:thing",
+]
+```
+
+Pass the config file and a `--data` directory to store already-seen versions across invocations:
 ```
 $ dependency-watch notify --data data config.yaml
 ```
 
-This will check for any new versions once and then exit. Run with `--watch` to continuously check
-every minute. Use `--interval` to adjust the check period.
+The `notify` subcommand will check for any new versions once and then exit.
+Run with `--watch` to continuously check every minute. Use `--interval` to adjust the check period.
 
 ### IFTTT
 
@@ -37,9 +51,9 @@ found. This notification can then be redirected to Twitter, Slack, email, printe
 light bulbs, and hundreds of other places.
 
 The event will have the following data set:
- - `Value1`: The groupId:artifactId pair (e.g., `com.example:example`)
- - `Value2`: The new versions that was seen (e.g., `1.1.0`)
- - `Value3`: Not used
+ - `Value1`: The maven repository name
+ - `Value2`: The groupId:artifactId pair (e.g., `com.example:example`)
+ - `Value3`: The new versions that was seen (e.g., `1.1.0`)
 
 
 ## Install
@@ -115,15 +129,16 @@ Commands:
 $ dependency-watch await --help
 Usage: dependency-watch await [OPTIONS] COORDINATES
 
-  Wait for an artifact to appear on Maven central then exit
+  Wait for an artifact to appear in a Maven repository then exit
 
 Options:
   --interval DURATION  Amount of time between checks in ISO8601 duration
                        format (default 1 minute)
   --ifttt URL          IFTTT webhook URL to trigger (see
                        https://ifttt.com/maker_webhooks)
-  --repo URL           URL of maven repository to check (default is Maven
-                       Central)
+  --repo URL           URL or well-known ID of maven repository to check
+                       (default is "MavenCentral"). Available well-known IDs:
+                       "MavenCentral", "GoogleMaven".
   -h, --help           Show this message and exit
 
 Arguments:
@@ -131,29 +146,46 @@ Arguments:
 ```
 ```
 $ dependency-watch notify --help
-Usage: dependency-watch notify [OPTIONS] [CONFIG]...
+Usage: dependency-watch notify [OPTIONS] CONFIG
 
-  Monitor Maven coordinates for new versions
+  Monitor Maven coordinates in a Maven repository for new versions
 
 Options:
-  --data PATH          Directory into which already-seen versions are tracked
-                       (default in-memory)
   --interval DURATION  Amount of time between checks in ISO8601 duration
                        format (default 1 minute)
   --ifttt URL          IFTTT webhook URL to trigger (see
                        https://ifttt.com/maker_webhooks)
+  --data PATH          Directory into which already-seen versions are tracked
+                       (default in-memory)
   --watch              Continually monitor for new versions every '--interval'
   -h, --help           Show this message and exit
 
 Arguments:
-  CONFIG  YAML file containing list of coordinates to watch
+  CONFIG  TOML file containing repositories and coordinates to watch
 
           Format:
 
-          repository: https://custom.repo/  # Optional! Default: Maven Central
-          coordinates:
-           - com.example.ping:pong
-           - com.example.fizz:buzz
+          [MavenCentral]
+          coordinates = [
+            "com.example.ping:pong",
+            "com.example.fizz:buzz",
+          ]
+
+          [GoogleMaven]
+          coordinates = [
+            "com.google:example",
+          ]
+
+          [CustomRepo]
+          name = "Custom Repo"  # Optional
+          host = "https://example.com/repo/"
+          coordinates = [
+            "com.example:thing",
+          ]
+
+          "MavenCentral" and "GoogleMaven" are two optional well-known
+          repositories which only require a list of coordinates. Other
+          repositories also require a host and can specify an optional name.
 ```
 
 

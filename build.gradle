@@ -22,7 +22,7 @@ dependencies {
 	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0'
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion"
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion"
-	implementation 'com.charleskorn.kaml:kaml:0.40.0'
+	implementation 'org.tomlj:tomlj:1.0.0'
 	implementation "io.github.pdvrieze.xmlutil:core:$xmlUtilVersion"
 	implementation "io.github.pdvrieze.xmlutil:serialization:$xmlUtilVersion"
 	implementation 'com.github.ajalt.clikt:clikt:3.4.0'
@@ -34,6 +34,7 @@ dependencies {
 	testImplementation 'com.google.jimfs:jimfs:1.2'
 	testImplementation "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
 	testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0'
+	testImplementation 'org.jetbrains.kotlin:kotlin-test'
 }
 
 repositories {

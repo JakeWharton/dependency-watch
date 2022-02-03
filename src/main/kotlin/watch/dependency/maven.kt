@@ -12,7 +12,6 @@ import nl.adaptivity.xmlutil.serialization.XML
 import nl.adaptivity.xmlutil.serialization.XmlChildrenName
 import nl.adaptivity.xmlutil.serialization.XmlSerialName
 import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import watch.dependency.MavenRepository.Versions
@@ -47,16 +46,28 @@ private object MavenCoordinateSerializer : KSerializer<MavenCoordinate> {
 }
 
 interface MavenRepository {
+	val name: String
 	suspend fun versions(coordinate: MavenCoordinate): Versions?
 
 	data class Versions(
 		val latest: String,
 		val all: Set<String>,
 	)
+
+	interface Factory {
+		fun maven2(name: String, url: HttpUrl): MavenRepository
+
+		class Http(private val client: OkHttpClient) : Factory {
+			override fun maven2(name: String, url: HttpUrl): MavenRepository {
+				return HttpMaven2Repository(client, name, url)
+			}
+		}
+	}
 }
 
-class HttpMaven2Repository(
+private class HttpMaven2Repository(
 	private val okhttp: OkHttpClient,
+	override val name: String,
 	private val url: HttpUrl,
 ) : MavenRepository {
 	override suspend fun versions(coordinate: MavenCoordinate): Versions? {
@@ -79,18 +90,7 @@ class HttpMaven2Repository(
 	}
 
 	companion object {
-		val MavenCentral = "https://repo1.maven.org/maven2/".toHttpUrl()
-		val GoogleMaven = "https://maven.google.com/".toHttpUrl()
-
-		fun parseWellKnownMavenRepositoryNameOrUrl(value: String): HttpUrl {
-			return when (value) {
-				"MavenCentral" -> MavenCentral
-				"GoogleMaven" -> GoogleMaven
-				else -> value.toHttpUrl()
-			}
-		}
-
-		private val xmlFormat = XML {
+		val xmlFormat = XML {
 			unknownChildHandler = UnknownChildHandler { _, _, _, _, _ -> emptyList() }
 		}
 	}

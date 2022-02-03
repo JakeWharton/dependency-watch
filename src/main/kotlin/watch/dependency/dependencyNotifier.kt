@@ -8,21 +8,24 @@ import kotlinx.coroutines.CoroutineStart.UNDISPATCHED
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
-import okhttp3.HttpUrl
-import okhttp3.OkHttpClient
 
 class DependencyNotifier(
-	private val mavenRepositoryFactory: MavenRepositoryFactory,
+	private val mavenRepositoryFactory: MavenRepository.Factory,
 	private val database: Database,
 	private val versionNotifier: VersionNotifier,
 	private val configPath: Path,
 	private val debug: Debug = Debug.Disabled,
 ) {
-	private fun createChecker(): DependencyChecker {
-		val config = Config.parseFromYaml(configPath.readText())
-		debug.log { config.toString() }
+	private fun readRepositoryConfigs(): List<RepositoryConfig> {
+		val configs = RepositoryConfig.parseConfigsFromToml(configPath.readText())
+		for (config in configs) {
+			debug.log { config.toString() }
+		}
+		return configs
+	}
 
-		val mavenRepository = mavenRepositoryFactory.create(config.repository)
+	private fun createChecker(config: RepositoryConfig): DependencyChecker {
+		val mavenRepository = mavenRepositoryFactory.maven2(config.name, config.host)
 		return DependencyChecker(
 			mavenRepository = mavenRepository,
 			coordinates = config.coordinates,
@@ -33,35 +36,38 @@ class DependencyNotifier(
 	}
 
 	suspend fun run() {
-		createChecker().check()
+		val configs = readRepositoryConfigs()
+		supervisorScope {
+			for (config in configs) {
+				launch {
+					createChecker(config).check()
+				}
+			}
+		}
 	}
 
 	suspend fun monitor(checkInterval: Duration): Nothing {
 		var lastModified: Long? = null
-		var checker: DependencyChecker? = null
+		var checkers = emptyList<DependencyChecker>()
 
 		while (true) {
 			// Parse the config inside the loop so you can edit it while running.
 			val newLastModified = configPath.getLastModifiedTime().toMillis()
-			if (checker == null || newLastModified != lastModified) {
+			if (newLastModified != lastModified) {
 				lastModified = newLastModified
-				checker = createChecker()
+				checkers = readRepositoryConfigs().map(::createChecker)
 			}
 
-			checker.check()
+			supervisorScope {
+				for (checker in checkers) {
+					launch {
+						checker.check()
+					}
+				}
+			}
 
 			debug.log { "Sleeping $checkInterval..." }
 			delay(checkInterval)
-		}
-	}
-
-	fun interface MavenRepositoryFactory {
-		fun create(url: HttpUrl): MavenRepository
-
-		class Http(val client: OkHttpClient) : MavenRepositoryFactory {
-			override fun create(url: HttpUrl): MavenRepository {
-				return HttpMaven2Repository(client, url)
-			}
 		}
 	}
 }
@@ -91,7 +97,7 @@ private class DependencyChecker(
 							database.markCoordinateVersionSeen(coordinates, mavenVersion)
 						}
 						for (version in notifyVersions) {
-							versionNotifier.notify(coordinates, version)
+							versionNotifier.notify(mavenRepository.name, coordinates, version)
 						}
 					}
 				}

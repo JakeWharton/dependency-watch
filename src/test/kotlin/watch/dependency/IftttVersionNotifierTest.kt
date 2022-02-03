@@ -16,11 +16,11 @@ class IftttVersionNotifierTest {
 		val notifier = IftttVersionNotifier(OkHttpClient(), serverUrl)
 
 		server.enqueue(MockResponse())
-		notifier.notify(MavenCoordinate("com.example", "example"), "1.1.0")
+		notifier.notify("Repo", MavenCoordinate("com.example", "example"), "1.1.0")
 
 		val request = server.takeRequest()
 		assertThat(request.body.readUtf8())
-			.isEqualTo("""{"value1":"com.example:example","value2":"1.1.0"}""")
+			.isEqualTo("""{"value1":"Repo","value2":"com.example:example","value3":"1.1.0"}""")
 		assertThat(request.requestUrl).isEqualTo(serverUrl)
 	}
 }

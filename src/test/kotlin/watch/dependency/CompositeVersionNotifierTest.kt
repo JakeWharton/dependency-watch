@@ -8,7 +8,7 @@ class CompositeVersionNotifierTest {
 	@Test fun notifyEmpty() = runBlocking {
 		val versionNotifier = listOf<VersionNotifier>().flatten()
 
-		versionNotifier.notify(MavenCoordinate("com.example", "example"), "1.0.0")
+		versionNotifier.notify("Repo", MavenCoordinate("com.example", "example"), "1.0.0")
 
 		// Nothing to test!
 	}
@@ -17,10 +17,10 @@ class CompositeVersionNotifierTest {
 		val recording = RecordingVersionNotifier()
 		val notifier = listOf(recording).flatten()
 
-		notifier.notify(MavenCoordinate("com.example", "example"), "1.0.0")
+		notifier.notify("Repo", MavenCoordinate("com.example", "example"), "1.0.0")
 
 		assertThat(recording.notifications).containsExactly(
-			"com.example:example:1.0.0",
+			"Repo com.example:example:1.0.0",
 		)
 	}
 
@@ -29,13 +29,13 @@ class CompositeVersionNotifierTest {
 		val recording2 = RecordingVersionNotifier()
 		val notifier = listOf(recording1, recording2).flatten()
 
-		notifier.notify(MavenCoordinate("com.example", "example"), "1.0.0")
+		notifier.notify("Repo", MavenCoordinate("com.example", "example"), "1.0.0")
 
 		assertThat(recording1.notifications).containsExactly(
-			"com.example:example:1.0.0",
+			"Repo com.example:example:1.0.0",
 		)
 		assertThat(recording2.notifications).containsExactly(
-			"com.example:example:1.0.0",
+			"Repo com.example:example:1.0.0",
 		)
 	}
 }

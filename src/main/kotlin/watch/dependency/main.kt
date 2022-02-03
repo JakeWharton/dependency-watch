@@ -24,9 +24,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC
-import watch.dependency.DependencyNotifier.MavenRepositoryFactory
-import watch.dependency.HttpMaven2Repository.Companion.MavenCentral
-import watch.dependency.HttpMaven2Repository.Companion.parseWellKnownMavenRepositoryNameOrUrl
+import watch.dependency.RepositoryConfig.Companion.MavenCentralId
 
 fun main(vararg args: String) {
 	NoOpCliktCommand(name = "dependency-watch")
@@ -62,6 +60,7 @@ private abstract class DependencyWatchCommand(
 				}
 			}
 			.build()
+		val mavenRepositoryFactory = MavenRepository.Factory.Http(okhttp)
 
 		val notifier = buildList {
 			add(ConsoleVersionNotifier)
@@ -71,7 +70,7 @@ private abstract class DependencyWatchCommand(
 		}.flatten()
 
 		try {
-			execute(okhttp, notifier, checkInterval, debug)
+			execute(mavenRepositoryFactory, notifier, checkInterval, debug)
 		} finally {
 			okhttp.dispatcher.executorService.shutdown()
 			okhttp.connectionPool.evictAll()
@@ -79,7 +78,7 @@ private abstract class DependencyWatchCommand(
 	}
 
 	protected abstract suspend fun execute(
-		client: OkHttpClient,
+		mavenRepositoryFactory: MavenRepository.Factory,
 		versionNotifier: VersionNotifier,
 		checkInterval: Duration,
 		debug: Debug,
@@ -90,19 +89,18 @@ private class AwaitCommand : DependencyWatchCommand(
 	name = "await",
 	help = "Wait for an artifact to appear in a Maven repository then exit",
 ) {
-	private val repoUrl by option("--repo", metavar = "URL")
+	private val repo by option("--repo", metavar = "URL")
 		.help("""
-			|URL or well-known name of maven repository to check (default is "MavenCentral").
-			|Available well-known names: "MavenCentral", "GoogleMaven".
+			|URL or well-known ID of maven repository to check (default is "MavenCentral").
+			|Available well-known IDs: "MavenCentral", "GoogleMaven".
 			|""".trimMargin()
 		)
-		.convert { parseWellKnownMavenRepositoryNameOrUrl(it) }
-		.default(MavenCentral)
+		.default(MavenCentralId)
 
 	private val coordinates by argument("COORDINATES", help = "Maven coordinates (e.g., 'com.example:example:1.0.0')")
 
 	override suspend fun execute(
-		client: OkHttpClient,
+		mavenRepositoryFactory: MavenRepository.Factory,
 		versionNotifier: VersionNotifier,
 		checkInterval: Duration,
 		debug: Debug,
@@ -113,7 +111,7 @@ private class AwaitCommand : DependencyWatchCommand(
 		}
 		debug.log { "$coordinate $version" }
 
-		val mavenRepository = HttpMaven2Repository(client, repoUrl)
+		val mavenRepository = mavenRepositoryFactory.parseWellKnownIdOrUrl(repo)
 		val app = DependencyAwait(
 			mavenRepository = mavenRepository,
 			versionNotifier = versionNotifier,
@@ -132,16 +130,33 @@ private class NotifyCommand(
 ) {
 	private val configPath by argument("CONFIG")
 		.help("""
-			|YAML file containing list of coordinates to watch
+			|TOML file containing repositories and coordinates to watch
 			|
 			|Format:
 			|
 			|```
-			|repository: https://custom.repo/  # Optional! Default: Maven Central
-			|coordinates:
-			| - com.example.ping:pong
-			| - com.example.fizz:buzz
+			|[MavenCentral]
+			|coordinates = [
+			|  "com.example.ping:pong",
+			|  "com.example.fizz:buzz",
+			|]
+			|
+			|[GoogleMaven]
+			|coordinates = [
+			|  "com.google:example",
+			|]
+			|
+			|[CustomRepo]
+			|name = "Custom Repo"  # Optional
+			|host = "https://example.com/repo/"
+			|coordinates = [
+			|  "com.example:thing",
+			|]
 			|```
+			|
+			|"MavenCentral" and "GoogleMaven" are two optional well-known repositories
+			|which only require a list of coordinates. Other repositories also require
+			|a host and can specify an optional name.
 			|""".trimMargin())
 		.path(fileSystem = fs)
 
@@ -156,13 +171,13 @@ private class NotifyCommand(
 		.help("Continually monitor for new versions every '--interval'")
 
 	override suspend fun execute(
-		client: OkHttpClient,
+		mavenRepositoryFactory: MavenRepository.Factory,
 		versionNotifier: VersionNotifier,
 		checkInterval: Duration,
 		debug: Debug,
 	) {
 		val notifier = DependencyNotifier(
-			mavenRepositoryFactory = MavenRepositoryFactory.Http(client),
+			mavenRepositoryFactory = mavenRepositoryFactory,
 			database = database,
 			versionNotifier = versionNotifier,
 			configPath = configPath,
