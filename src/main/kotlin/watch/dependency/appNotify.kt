@@ -1,6 +1,5 @@
 package watch.dependency
 
-import com.charleskorn.kaml.Yaml
 import java.nio.file.Path
 import kotlin.io.path.readText
 import kotlin.time.Duration
@@ -8,7 +7,6 @@ import kotlinx.coroutines.CoroutineStart.UNDISPATCHED
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
-import kotlinx.serialization.Serializable
 
 class DependencyNotify(
 	private val mavenRepository: MavenRepository,
@@ -20,7 +18,7 @@ class DependencyNotify(
 	suspend fun notify(config: Path, watch: Boolean = false) {
 		while (true) {
 			// Parse the config inside the loop so you can edit while running.
-			val parsedConfig = Yaml.default.decodeFromString(Config.serializer(), config.readText())
+			val parsedConfig = Config.parseFromYaml(config.readText())
 			debug.log { parsedConfig.toString() }
 
 			supervisorScope {
@@ -55,9 +53,4 @@ class DependencyNotify(
 			delay(checkInterval)
 		}
 	}
-
-	@Serializable
-	private data class Config(
-		val coordinates: List<MavenCoordinate>,
-	)
 }
