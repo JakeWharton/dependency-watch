@@ -86,7 +86,7 @@ $ docker run -it --rm
     -v /path/to/data:/data \
     -e "CRON=0 * * * *" \
     -e "NOTIFY_IFTTT=..." \
-    jakewharton/dependency-watch:trunk
+    jakewharton/dependency-watch:0.4
 ```
 
 To be notified when sync is failing visit https://healthchecks.io, create a check, and specify
@@ -98,7 +98,7 @@ the ID to the container using the `HEALTHCHECK_ID` environment variable.
 version: '2'
 services:
   dependency-watch:
-    image: jakewharton/dependency-watch:trunk
+    image: jakewharton/dependency-watch:0.4
     restart: unless-stopped
     volumes:
       - /path/to/config:/config
