@@ -9,11 +9,11 @@ import org.junit.Rule
 import org.junit.Test
 import watch.dependency.MavenRepository.Versions
 
-class Maven2RepositoryTest {
+class HttpMaven2RepositoryTest {
 	@get:Rule val server = MockWebServer()
 
 	@Test fun simple() = runBlocking {
-		val repository = Maven2Repository(OkHttpClient(), server.url("/"))
+		val repository = HttpMaven2Repository(OkHttpClient(), server.url("/"))
 
 		server.enqueue(MockResponse()
 			.setBody("""
@@ -54,7 +54,7 @@ class Maven2RepositoryTest {
 	}
 
 	@Test fun notFoundReturnsNull() = runBlocking {
-		val repository = Maven2Repository(OkHttpClient(), server.url("/"))
+		val repository = HttpMaven2Repository(OkHttpClient(), server.url("/"))
 		server.enqueue(MockResponse().setResponseCode(404))
 		val version = repository.versions(MavenCoordinate("com.example", "example"))
 		assertThat(version).isNull()
