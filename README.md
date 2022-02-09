@@ -37,7 +37,7 @@ coordinates = [
 
 Pass the config file and a `--data` directory to store already-seen versions across invocations:
 ```
-$ dependency-watch notify --data data config.yaml
+$ dependency-watch notify --data data config.toml
 ```
 
 The `notify` subcommand will check for any new versions once and then exit.
