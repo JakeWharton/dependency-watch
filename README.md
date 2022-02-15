@@ -5,7 +5,7 @@ versions.
 
 Just release a new artifact and want to know when you can start using it?
 ```
-$ dependency-watch await com.example:example:1.1.0 && say "Example 1.1.0 is available!"
+dependency-watch await com.example:example:1.1.0 && say "Example 1.1.0 is available!"
 ```
 
 Pipe to a notification, email, HTTP request, sound, or anything else your heart desires.
@@ -37,7 +37,7 @@ coordinates = [
 
 Pass the config file and a `--data` directory to store already-seen versions across invocations:
 ```
-$ dependency-watch notify --data data config.toml
+dependency-watch notify --data data config.toml
 ```
 
 The `notify` subcommand will check for any new versions once and then exit.
@@ -61,7 +61,7 @@ The event will have the following data set:
 **Mac OS**
 
 ```
-$ brew install JakeWharton/repo/dependency-watch
+brew install JakeWharton/repo/dependency-watch
 ```
 
 **Other**
@@ -83,7 +83,7 @@ The container runs the tool using cron on a specified schedule and will notify I
 The container looks in `/config` for any `*.toml` files, but only one is supported.
 
 ```
-$ docker run -it --rm
+docker run -it --rm
     -v /path/to/config:/config \
     -v /path/to/data:/data \
     -e "CRON=0 * * * *" \
