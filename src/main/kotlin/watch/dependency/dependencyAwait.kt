@@ -1,8 +1,12 @@
 package watch.dependency
 
-import kotlin.time.Duration
 import kotlinx.coroutines.delay
 import watch.dependency.Debug.Disabled
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import kotlin.LazyThreadSafetyMode.NONE
+import kotlin.time.Duration
 
 class DependencyAwait(
 	private val mavenRepository: MavenRepository,
@@ -23,10 +27,21 @@ class DependencyAwait(
 				break
 			}
 
+			print("Last checked at ${formatter.format(Instant.now())}. " +
+				"Next check in ${checkInterval.inWholeSeconds} seconds.\r")
+
 			debug.log { "Sleeping $checkInterval..." }
       delay(checkInterval)
 		}
 
+		println("Metadata fetched at ${formatter.format(Instant.now())}")
+
 		versionNotifier.notify(mavenRepository.name, coordinate, version)
+	}
+
+	companion object {
+		private val formatter by lazy(NONE) {
+			DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault())
+		}
 	}
 }
