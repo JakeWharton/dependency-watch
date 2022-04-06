@@ -22,7 +22,7 @@ jobs:
           distribution: 'zulu'
           java-version: 17
 
-      - uses: crazy-max/ghaction-docker-meta@v1
+      - uses: crazy-max/ghaction-docker-meta@v3.7.0
         id: docker_meta
         with:
           images: |
