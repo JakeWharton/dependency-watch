@@ -11,10 +11,10 @@ COPY src ./src
 RUN ./gradlew build
 
 
-FROM golang:alpine AS shell
+FROM golang:1.18-alpine AS shell
 RUN apk add --no-cache shellcheck
 ENV GO111MODULE=on
-RUN go get mvdan.cc/sh/v3/cmd/shfmt
+RUN go install mvdan.cc/sh/v3/cmd/shfmt@latest
 WORKDIR /overlay
 COPY root/ ./
 COPY .editorconfig /
