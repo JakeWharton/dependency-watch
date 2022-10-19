@@ -22,7 +22,7 @@ dependencies {
 	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion"
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion"
-	implementation 'org.tomlj:tomlj:1.0.0'
+	implementation 'org.tomlj:tomlj:1.1.0'
 	implementation "io.github.pdvrieze.xmlutil:core:$xmlUtilVersion"
 	implementation "io.github.pdvrieze.xmlutil:serialization:$xmlUtilVersion"
 	implementation 'com.github.ajalt.clikt:clikt:3.5.0'
