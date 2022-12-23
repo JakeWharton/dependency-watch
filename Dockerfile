@@ -1,4 +1,4 @@
-FROM adoptopenjdk:8-jdk-hotspot AS build
+FROM adoptopenjdk:11.0.11_9-jdk-hotspot AS build
 ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dkotlin.incremental=false"
 WORKDIR /app
 
