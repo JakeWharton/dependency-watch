@@ -26,6 +26,7 @@ dependencies {
 	implementation "io.github.pdvrieze.xmlutil:core:$xmlUtilVersion"
 	implementation "io.github.pdvrieze.xmlutil:serialization:$xmlUtilVersion"
 	implementation 'com.github.ajalt.clikt:clikt:3.5.1'
+	implementation 'com.github.ajalt.mordant:mordant:2.0.0-beta11'
 	implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
 	implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
 

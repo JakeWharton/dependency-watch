@@ -15,6 +15,8 @@ import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
 import com.github.ajalt.clikt.parameters.types.path
+import com.github.ajalt.mordant.terminal.Terminal
+import kotlinx.coroutines.delay
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import kotlin.time.Duration
@@ -98,6 +100,7 @@ private class AwaitCommand : DependencyWatchCommand(
 		.default(MavenCentralId)
 
 	private val coordinates by argument("COORDINATES", help = "Maven coordinates (e.g., 'com.example:example:1.0.0')")
+	private val terminal = Terminal()
 
 	override suspend fun execute(
 		mavenRepositoryFactory: MavenRepository.Factory,
@@ -118,7 +121,9 @@ private class AwaitCommand : DependencyWatchCommand(
 			checkInterval = checkInterval,
 			debug = debug,
 		)
-		app.await(coordinate, version)
+		terminal.withProgressAnimation {
+			app.await(coordinate, version)
+		}
 	}
 }
 
