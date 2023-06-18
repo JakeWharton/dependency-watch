@@ -30,7 +30,7 @@ dependencies {
 	implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
 
 	testImplementation 'junit:junit:4.13.2'
-	testImplementation 'com.google.truth:truth:1.1.4'
+	testImplementation 'com.google.truth:truth:1.1.5'
 	testImplementation 'com.google.jimfs:jimfs:1.2'
 	testImplementation "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
 	testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1'
