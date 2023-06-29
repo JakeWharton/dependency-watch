@@ -19,7 +19,7 @@ dependencies {
 	def kotlinxSerializationVersion = '1.5.1'
 	def xmlUtilVersion = '0.86.0'
 
-	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
+	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2'
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion"
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion"
 	implementation 'org.tomlj:tomlj:1.1.0'
