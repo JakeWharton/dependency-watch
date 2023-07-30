@@ -25,7 +25,7 @@ dependencies {
 	implementation 'org.tomlj:tomlj:1.1.0'
 	implementation "io.github.pdvrieze.xmlutil:core:$xmlUtilVersion"
 	implementation "io.github.pdvrieze.xmlutil:serialization:$xmlUtilVersion"
-	implementation 'com.github.ajalt.clikt:clikt:4.1.0'
+	implementation 'com.github.ajalt.clikt:clikt:4.2.0'
 	implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
 	implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
 
