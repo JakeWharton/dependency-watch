@@ -16,7 +16,7 @@ mainClassName = 'watch.dependency.Main'
 
 dependencies {
 	def okhttpVersion = '4.11.0'
-	def kotlinxSerializationVersion = '1.5.1'
+	def kotlinxSerializationVersion = '1.6.0'
 	def xmlUtilVersion = '0.86.1'
 
 	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
