@@ -33,7 +33,7 @@ jobs:
             {{major}}
             {{major}}.{{minor}}
 
-      - uses: docker/login-action@v2
+      - uses: docker/login-action@v3
         with:
           username: jakewharton
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
