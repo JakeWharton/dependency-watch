@@ -43,7 +43,7 @@ class DatabaseTest(
 		@Parameters(name = "{0}")
 		fun data() = listOf(
 			arrayOf("memory", InMemoryDatabase()),
-			arrayOf("fs", FileSystemDatabase(Jimfs.newFileSystem(unix()).rootDirectory))
+			arrayOf("fs", FileSystemDatabase(Jimfs.newFileSystem(unix()).rootDirectory)),
 		)
 	}
 }

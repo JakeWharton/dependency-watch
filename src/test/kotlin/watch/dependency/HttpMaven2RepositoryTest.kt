@@ -15,8 +15,10 @@ class HttpMaven2RepositoryTest {
 		MavenRepository.Factory.Http(OkHttpClient()).maven2("MWS", server.url("/"))
 
 	@Test fun simple() = runBlocking {
-		server.enqueue(MockResponse()
-			.setBody("""
+		server.enqueue(
+			MockResponse()
+				.setBody(
+					"""
 				|<metadata>
 				|  <groupId>com.example</groupId>
 				|  <artifactId>example</artifactId>
@@ -34,19 +36,25 @@ class HttpMaven2RepositoryTest {
 				|    <lastUpdated>20200520162908</lastUpdated>
 				|  </versioning>
 				|</metadata>
-				|""".trimMargin()))
+				|
+					""".trimMargin(),
+				),
+		)
 
 		val versions = repository.versions(MavenCoordinate("com.example", "example"))
-		assertThat(versions).isEqualTo(Versions(
-			latest = "1.1.0",
-			all = setOf(
-				"1.0.0-alpha1",
-				"1.0.0-alpha2",
-				"1.0.0-beta3",
-				"1.0.0-beta4",
-				"1.0.0",
-				"1.1.0",
-		)))
+		assertThat(versions).isEqualTo(
+			Versions(
+				latest = "1.1.0",
+				all = setOf(
+					"1.0.0-alpha1",
+					"1.0.0-alpha2",
+					"1.0.0-beta3",
+					"1.0.0-beta4",
+					"1.0.0",
+					"1.1.0",
+				),
+			),
+		)
 
 		val request = server.takeRequest()
 		assertThat(request.requestUrl)

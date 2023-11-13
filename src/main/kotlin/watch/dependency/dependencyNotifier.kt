@@ -83,7 +83,7 @@ private class DependencyChecker(
 		supervisorScope {
 			for (coordinates in coordinates) {
 				launch(start = UNDISPATCHED) {
-					debug.log { "Fetching metadata for $coordinates..."  }
+					debug.log { "Fetching metadata for $coordinates..." }
 					val versions = mavenRepository.versions(coordinates)
 					debug.log { "$coordinates $versions" }
 

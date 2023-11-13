@@ -4,18 +4,18 @@ import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.tomlj.Toml
 import org.tomlj.TomlTable
-import watch.dependency.RepositoryConfig.Companion.GoogleMavenHost
-import watch.dependency.RepositoryConfig.Companion.GoogleMavenId
-import watch.dependency.RepositoryConfig.Companion.GoogleMavenName
-import watch.dependency.RepositoryConfig.Companion.MavenCentralHost
-import watch.dependency.RepositoryConfig.Companion.MavenCentralId
-import watch.dependency.RepositoryConfig.Companion.MavenCentralName
+import watch.dependency.RepositoryConfig.Companion.GOOGLE_MAVEN_HOST
+import watch.dependency.RepositoryConfig.Companion.GOOGLE_MAVEN_ID
+import watch.dependency.RepositoryConfig.Companion.GOOGLE_MAVEN_NAME
+import watch.dependency.RepositoryConfig.Companion.MAVEN_CENTRAL_HOST
+import watch.dependency.RepositoryConfig.Companion.MAVEN_CENTRAL_ID
+import watch.dependency.RepositoryConfig.Companion.MAVEN_CENTRAL_NAME
 import watch.dependency.RepositoryType.Maven2
 
 fun MavenRepository.Factory.parseWellKnownIdOrUrl(value: String): MavenRepository {
 	return when (value) {
-		MavenCentralId -> maven2(MavenCentralName, MavenCentralHost)
-		GoogleMavenId -> maven2(GoogleMavenName, GoogleMavenHost)
+		MAVEN_CENTRAL_ID -> maven2(MAVEN_CENTRAL_NAME, MAVEN_CENTRAL_HOST)
+		GOOGLE_MAVEN_ID -> maven2(GOOGLE_MAVEN_NAME, GOOGLE_MAVEN_HOST)
 		else -> maven2("Maven Repository", value.toHttpUrl())
 	}
 }
@@ -27,16 +27,16 @@ data class RepositoryConfig(
 	val coordinates: List<MavenCoordinate>,
 ) {
 	companion object {
-		const val MavenCentralId = "MavenCentral"
-		const val MavenCentralName = "Maven Central"
-		val MavenCentralHost = "https://repo1.maven.org/maven2/".toHttpUrl()
-		const val GoogleMavenId = "GoogleMaven"
-		const val GoogleMavenName = "Google Maven"
-		val GoogleMavenHost = "https://maven.google.com/".toHttpUrl()
-		private const val TomlKeyName = "name"
-		private const val TomlKeyHost = "host"
-		private const val TomlKeyType = "type"
-		private const val TomlKeyCoordinates = "coordinates"
+		const val MAVEN_CENTRAL_ID = "MavenCentral"
+		const val MAVEN_CENTRAL_NAME = "Maven Central"
+		val MAVEN_CENTRAL_HOST = "https://repo1.maven.org/maven2/".toHttpUrl()
+		const val GOOGLE_MAVEN_ID = "GoogleMaven"
+		const val GOOGLE_MAVEN_NAME = "Google Maven"
+		val GOOGLE_MAVEN_HOST = "https://maven.google.com/".toHttpUrl()
+		private const val TOML_KEY_NAME = "name"
+		private const val TOML_KEY_HOST = "host"
+		private const val TOML_KEY_TYPE = "type"
+		private const val TOML_KEY_COORDINATES = "coordinates"
 
 		private fun TomlTable.getCoordinates(key: String): List<MavenCoordinate> {
 			val coordinateArray = getArray(key)!!
@@ -49,14 +49,14 @@ data class RepositoryConfig(
 			var coordinates: List<MavenCoordinate>? = null
 			for (key in keySet()) {
 				when (key) {
-					TomlKeyCoordinates -> coordinates = getCoordinates(key)
-					TomlKeyName, TomlKeyHost, TomlKeyType -> {
+					TOML_KEY_COORDINATES -> coordinates = getCoordinates(key)
+					TOML_KEY_NAME, TOML_KEY_HOST, TOML_KEY_TYPE -> {
 						throw IllegalArgumentException("'$self' table must not define a '$key' key")
 					}
 					else -> throw IllegalArgumentException("'$self' table contains unknown '$key' key")
 				}
 			}
-			requireNotNull(coordinates) { "'$self' table missing required '$TomlKeyCoordinates' key" }
+			requireNotNull(coordinates) { "'$self' table missing required '$TOML_KEY_COORDINATES' key" }
 			return RepositoryConfig(name, host, Maven2, coordinates)
 		}
 
@@ -67,15 +67,15 @@ data class RepositoryConfig(
 			var coordinates: List<MavenCoordinate>? = null
 			for (key in keySet()) {
 				when (key) {
-					TomlKeyName -> name = getString(key)!!
-					TomlKeyHost -> host = getString(key)!!.toHttpUrl()
-					TomlKeyType -> type = RepositoryType.valueOf(getString(key)!!)
-					TomlKeyCoordinates -> coordinates = getCoordinates(key)
+					TOML_KEY_NAME -> name = getString(key)!!
+					TOML_KEY_HOST -> host = getString(key)!!.toHttpUrl()
+					TOML_KEY_TYPE -> type = RepositoryType.valueOf(getString(key)!!)
+					TOML_KEY_COORDINATES -> coordinates = getCoordinates(key)
 					else -> throw IllegalArgumentException("'$self' table contains unknown key '$key'")
 				}
 			}
-			requireNotNull(host) { "'$self' table missing required '$TomlKeyHost' key" }
-			requireNotNull(coordinates) { "'$self' table missing required '$TomlKeyCoordinates' key" }
+			requireNotNull(host) { "'$self' table missing required '$TOML_KEY_HOST' key" }
+			requireNotNull(coordinates) { "'$self' table missing required '$TOML_KEY_COORDINATES' key" }
 			return RepositoryConfig(name, host, type, coordinates)
 		}
 
@@ -87,8 +87,8 @@ data class RepositoryConfig(
 			for (key in parseResult.keySet()) {
 				val table = parseResult.getTable(key)!!
 				this += when (key) {
-					MavenCentralId -> table.tryParseWellKnown(MavenCentralId, MavenCentralName, MavenCentralHost)
-					GoogleMavenId -> table.tryParseWellKnown(GoogleMavenId, GoogleMavenName, GoogleMavenHost)
+					MAVEN_CENTRAL_ID -> table.tryParseWellKnown(MAVEN_CENTRAL_ID, MAVEN_CENTRAL_NAME, MAVEN_CENTRAL_HOST)
+					GOOGLE_MAVEN_ID -> table.tryParseWellKnown(GOOGLE_MAVEN_ID, GOOGLE_MAVEN_NAME, GOOGLE_MAVEN_HOST)
 					else -> table.tryParseCustom(key)
 				}
 			}

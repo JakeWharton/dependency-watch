@@ -11,8 +11,8 @@ import kotlinx.coroutines.test.runTest
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Test
-import watch.dependency.RepositoryConfig.Companion.MavenCentralHost
-import watch.dependency.RepositoryConfig.Companion.MavenCentralName
+import watch.dependency.RepositoryConfig.Companion.MAVEN_CENTRAL_HOST
+import watch.dependency.RepositoryConfig.Companion.MAVEN_CENTRAL_NAME
 
 class DependencyNotifierTest {
 	private val config = Jimfs.newFileSystem().rootDirectory.resolve("config.toml")
@@ -30,17 +30,20 @@ class DependencyNotifierTest {
 	)
 
 	@Test fun run() = runTest {
-		config.writeText("""
+		config.writeText(
+			"""
 			|[MavenCentral]
 			|coordinates = [
 			|  "com.example:example-a",
 			|]
-			|""".trimMargin())
+			|
+			""".trimMargin(),
+		)
 
 		notifier.run()
 		assertThat(versionNotifier.notifications).isEmpty()
 
-		val mavenCentral = mavenRepositories[MavenCentralHost]!!
+		val mavenCentral = mavenRepositories[MAVEN_CENTRAL_HOST]!!
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 
 		notifier.run()
@@ -51,7 +54,8 @@ class DependencyNotifierTest {
 
 	@Test fun runChecksMultipleRepos() = runTest {
 		val customHost = "https://example.com/".toHttpUrl()
-		config.writeText("""
+		config.writeText(
+			"""
 			|[MavenCentral]
 			|coordinates = [
 			|  "com.example:example-a",
@@ -62,12 +66,14 @@ class DependencyNotifierTest {
 			|coordinates = [
 			|  "com.example:example-b",
 			|]
-			|""".trimMargin())
+			|
+			""".trimMargin(),
+		)
 
 		notifier.run()
 		assertThat(versionNotifier.notifications).isEmpty()
 
-		val mavenCentral = mavenRepositories[MavenCentralHost]!!
+		val mavenCentral = mavenRepositories[MAVEN_CENTRAL_HOST]!!
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 		val customRepository = mavenRepositories[customHost]!!
 		customRepository.addArtifact(MavenCoordinate("com.example", "example-b"), "1.0")
@@ -80,12 +86,15 @@ class DependencyNotifierTest {
 	}
 
 	@Test fun notifyNotifiesOnceAvailable() = runTest {
-		config.writeText("""
+		config.writeText(
+			"""
 			|[MavenCentral]
 			|coordinates = [
 			|  "com.example:example-a",
 			|]
-			|""".trimMargin())
+			|
+			""".trimMargin(),
+		)
 
 		val monitorJob = launch {
 			notifier.monitor(5.seconds)
@@ -94,7 +103,7 @@ class DependencyNotifierTest {
 		runCurrent()
 		assertThat(versionNotifier.notifications).isEmpty()
 
-		val mavenCentral = mavenRepositories[MavenCentralHost]!!
+		val mavenCentral = mavenRepositories[MAVEN_CENTRAL_HOST]!!
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 
 		advanceTimeBy(5.seconds)
@@ -108,7 +117,8 @@ class DependencyNotifierTest {
 
 	@Test fun notifyChecksMultipleReposAndNotifiesOnceAvailable() = runTest {
 		val customHost = "https://example.com/".toHttpUrl()
-		config.writeText("""
+		config.writeText(
+			"""
 			|[MavenCentral]
 			|coordinates = [
 			|  "com.example:example-a",
@@ -119,7 +129,9 @@ class DependencyNotifierTest {
 			|coordinates = [
 			|  "com.example:example-b",
 			|]
-			|""".trimMargin())
+			|
+			""".trimMargin(),
+		)
 
 		val monitorJob = launch {
 			notifier.monitor(5.seconds)
@@ -128,7 +140,7 @@ class DependencyNotifierTest {
 		runCurrent()
 		assertThat(versionNotifier.notifications).isEmpty()
 
-		val mavenCentral = mavenRepositories[MavenCentralHost]!!
+		val mavenCentral = mavenRepositories[MAVEN_CENTRAL_HOST]!!
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 		val customRepository = mavenRepositories[customHost]!!
 		customRepository.addArtifact(MavenCoordinate("com.example", "example-b"), "1.0")
@@ -144,12 +156,14 @@ class DependencyNotifierTest {
 	}
 
 	@Test fun monitorNotifiesLatestFirstTime() = runTest {
-		config.writeText("""
+		config.writeText(
+			"""
 			|[MavenCentral]
 			|coordinates = [
 			|  "com.example:example-a",
 			|]
-		""".trimMargin())
+			""".trimMargin(),
+		)
 
 		val monitorJob = launch {
 			notifier.monitor(5.seconds)
@@ -158,7 +172,7 @@ class DependencyNotifierTest {
 		runCurrent()
 		assertThat(versionNotifier.notifications).isEmpty()
 
-		val mavenCentral = mavenRepositories[MavenCentralHost]!!
+		val mavenCentral = mavenRepositories[MAVEN_CENTRAL_HOST]!!
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.1")
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.2")
@@ -174,12 +188,14 @@ class DependencyNotifierTest {
 	}
 
 	@Test fun monitorNotifiesAllNewSecondTime() = runTest {
-		config.writeText("""
+		config.writeText(
+			"""
 			|[MavenCentral]
 			|coordinates = [
 			|  "com.example:example-a",
 			|]
-		""".trimMargin())
+			""".trimMargin(),
+		)
 
 		val monitorJob = launch {
 			notifier.monitor(5.seconds)
@@ -188,7 +204,7 @@ class DependencyNotifierTest {
 		runCurrent()
 		assertThat(versionNotifier.notifications).isEmpty()
 
-		val mavenCentral = mavenRepositories[MavenCentralHost]!!
+		val mavenCentral = mavenRepositories[MAVEN_CENTRAL_HOST]!!
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.1")
 
@@ -213,15 +229,18 @@ class DependencyNotifierTest {
 	}
 
 	@Test fun monitorReadsConfigForEachCheck() = runTest {
-		config.writeText("""
+		config.writeText(
+			"""
 			|[MavenCentral]
 			|coordinates = [
 			|  "com.example:example-a",
 			|]
-			|""".trimMargin())
+			|
+			""".trimMargin(),
+		)
 
 		// Create and write the repo to the map so it's available on first run.
-		val mavenCentral = FakeMavenRepository(MavenCentralName).also { mavenRepositories[MavenCentralHost] = it }
+		val mavenCentral = FakeMavenRepository(MAVEN_CENTRAL_NAME).also { mavenRepositories[MAVEN_CENTRAL_HOST] = it }
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 
 		val monitorJob = launch {
@@ -241,13 +260,16 @@ class DependencyNotifierTest {
 			"Maven Central com.example:example-a:1.0",
 		)
 
-		config.writeText("""
+		config.writeText(
+			"""
 			|[MavenCentral]
 			|coordinates = [
 			|  "com.example:example-a",
 			|  "com.example:example-b",
 			|]
-			|""".trimMargin())
+			|
+			""".trimMargin(),
+		)
 		advanceTimeBy(5.seconds)
 		runCurrent()
 		assertThat(versionNotifier.notifications).containsExactly(

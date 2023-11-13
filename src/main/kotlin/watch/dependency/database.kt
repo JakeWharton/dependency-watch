@@ -44,14 +44,14 @@ class FileSystemDatabase(private val root: Path) : Database {
 
 	override fun coordinateVersionSeen(
 		coordinate: MavenCoordinate,
-		version: String
+		version: String,
 	): Boolean {
 		return path(coordinate, version).exists()
 	}
 
 	override fun markCoordinateVersionSeen(
 		coordinate: MavenCoordinate,
-		version: String
+		version: String,
 	) {
 		val path = path(coordinate, version)
 		if (path.notExists()) {

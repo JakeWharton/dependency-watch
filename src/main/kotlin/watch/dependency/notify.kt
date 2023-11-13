@@ -59,7 +59,7 @@ class IftttVersionNotifier(
 	private data class PostBody(
 		val value1: String? = null,
 		val value2: String? = null,
-		val value3: String? = null
+		val value3: String? = null,
 	) {
 		fun toJson(): RequestBody {
 			val json = format.encodeToString(serializer(), this)

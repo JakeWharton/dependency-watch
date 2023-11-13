@@ -2,13 +2,13 @@
 
 package watch.dependency
 
+import java.io.IOException
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
-import java.io.IOException
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 class HttpException(val code: Int, message: String) : RuntimeException("$code $message")
 
@@ -22,7 +22,7 @@ suspend fun Call.await(): String {
 						continuation.resume(body)
 					} else {
 						continuation.resumeWithException(
-							HttpException(response.code, response.message)
+							HttpException(response.code, response.message),
 						)
 					}
 				}
