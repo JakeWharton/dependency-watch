@@ -101,6 +101,7 @@ private class AwaitCommand : DependencyWatchCommand(
 		.default(MAVEN_CENTRAL_ID)
 
 	private val quiet by option("--quiet", "-q")
+		.help("Hide 'Last checked' output")
 		.flag()
 
 	private val coordinates by argument("COORDINATES", help = "Maven coordinates (e.g., 'com.example:example:1.0.0')")

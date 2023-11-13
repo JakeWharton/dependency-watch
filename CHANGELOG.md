@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [0.5.0] - 2023-11-13
+
+### Added
+
+ - The 'await' command will now display the date and time when the Maven repos were last checked. This
+   will only be displayed for interactive terminals, and can be disabled with `-q`/`--quiet` flag.
+
+
 ## [0.4.1] - 2022-02-03
 
 ### Fixed
@@ -52,7 +60,8 @@
  - Initial release
 
 
-[Unreleased]: https://github.com/JakeWharton/dependency-watch/compare/0.4.1...HEAD
+[Unreleased]: https://github.com/JakeWharton/dependency-watch/compare/0.5.0...HEAD
+[0.5.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.5.0
 [0.4.1]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.4.1
 [0.4.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.4.0
 [0.3.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.3.0

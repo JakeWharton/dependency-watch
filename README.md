@@ -100,7 +100,7 @@ the ID to the container using the `HEALTHCHECK_ID` environment variable.
 version: '2'
 services:
   dependency-watch:
-    image: jakewharton/dependency-watch:0.4
+    image: jakewharton/dependency-watch:0.5
     restart: unless-stopped
     volumes:
       - /path/to/config:/config
@@ -118,76 +118,80 @@ services:
 
 ```
 $ dependency-watch --help
-Usage: dependency-watch [OPTIONS] COMMAND [ARGS]...
+Usage: dependency-watch [<options>] <command> [<args>]...
 
 Options:
   -h, --help  Show this message and exit
 
 Commands:
-  await    Wait for an artifact to appear on Maven central then exit
-  notify   Monitor Maven coordinates for new versions
+  await   Wait for an artifact to appear in a Maven repository then exit
+  notify  Monitor Maven coordinates in a Maven repository for new versions
 ```
 ```
 $ dependency-watch await --help
-Usage: dependency-watch await [OPTIONS] COORDINATES
+Usage: dependency-watch await [<options>] <coordinates>
 
   Wait for an artifact to appear in a Maven repository then exit
 
 Options:
-  --interval DURATION  Amount of time between checks in ISO8601 duration
-                       format (default 1 minute)
-  --ifttt URL          IFTTT webhook URL to trigger (see
-                       https://ifttt.com/maker_webhooks)
-  --repo URL           URL or well-known ID of maven repository to check
-                       (default is "MavenCentral"). Available well-known IDs:
-                       "MavenCentral", "GoogleMaven".
-  -h, --help           Show this message and exit
+  --interval=<duration>  Amount of time between checks in ISO8601 duration
+                         format (default 1 minute)
+  --ifttt=<url>          IFTTT webhook URL to trigger (see
+                         https://ifttt.com/maker_webhooks)
+  --repo=<url>           URL or well-known ID of maven repository to check
+                         (default is "MavenCentral"). Available well-known IDs:
+                         "MavenCentral", "GoogleMaven".
+
+  -q, --quiet            Hide 'Last checked' output
+  -h, --help             Show this message and exit
 
 Arguments:
-  COORDINATES  Maven coordinates (e.g., 'com.example:example:1.0.0')
+  <coordinates>  Maven coordinates (e.g., 'com.example:example:1.0.0')
 ```
 ```
 $ dependency-watch notify --help
-Usage: dependency-watch notify [OPTIONS] CONFIG
+Usage: dependency-watch notify [<options>] <config>
 
   Monitor Maven coordinates in a Maven repository for new versions
 
 Options:
-  --interval DURATION  Amount of time between checks in ISO8601 duration
-                       format (default 1 minute)
-  --ifttt URL          IFTTT webhook URL to trigger (see
-                       https://ifttt.com/maker_webhooks)
-  --data PATH          Directory into which already-seen versions are tracked
-                       (default in-memory)
-  --watch              Continually monitor for new versions every '--interval'
-  -h, --help           Show this message and exit
+  --interval=<duration>  Amount of time between checks in ISO8601 duration
+                         format (default 1 minute)
+  --ifttt=<url>          IFTTT webhook URL to trigger (see
+                         https://ifttt.com/maker_webhooks)
+  --data=<path>          Directory into which already-seen versions are tracked
+                         (default in-memory)
+  --watch                Continually monitor for new versions every '--interval'
+  -h, --help             Show this message and exit
 
 Arguments:
-  CONFIG  TOML file containing repositories and coordinates to watch
+  <config>  TOML file containing repositories and coordinates to watch
 
-          Format:
+            Format:
 
-          [MavenCentral]
-          coordinates = [
-            "com.example.ping:pong",
-            "com.example.fizz:buzz",
-          ]
+            ╭──────────────────────────────────╮
+            │[MavenCentral]                    │
+            │coordinates = [                   │
+            │  "com.example.ping:pong",        │
+            │  "com.example.fizz:buzz",        │
+            │]                                 │
+            │                                  │
+            │[GoogleMaven]                     │
+            │coordinates = [                   │
+            │  "com.google:example",           │
+            │]                                 │
+            │                                  │
+            │[CustomRepo]                      │
+            │name = "Custom Repo"  # Optional  │
+            │host = "https://example.com/repo/"│
+            │coordinates = [                   │
+            │  "com.example:thing",            │
+            │]                                 │
+            ╰──────────────────────────────────╯
 
-          [GoogleMaven]
-          coordinates = [
-            "com.google:example",
-          ]
-
-          [CustomRepo]
-          name = "Custom Repo"  # Optional
-          host = "https://example.com/repo/"
-          coordinates = [
-            "com.example:thing",
-          ]
-
-          "MavenCentral" and "GoogleMaven" are two optional well-known
-          repositories which only require a list of coordinates. Other
-          repositories also require a host and can specify an optional name.
+            "MavenCentral" and "GoogleMaven" are two optional well-known
+            repositories which only require a list of coordinates. Other
+            repositories also require a host and can specify an optional name.
 ```
 
 
