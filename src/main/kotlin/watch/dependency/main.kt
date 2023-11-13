@@ -15,6 +15,7 @@ import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
 import com.github.ajalt.clikt.parameters.types.path
+import com.github.ajalt.mordant.terminal.Terminal
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import kotlin.time.Duration
@@ -97,6 +98,9 @@ private class AwaitCommand : DependencyWatchCommand(
 		)
 		.default(MavenCentralId)
 
+	private val quiet by option("--quiet", "-q")
+		.flag()
+
 	private val coordinates by argument("COORDINATES", help = "Maven coordinates (e.g., 'com.example:example:1.0.0')")
 
 	override suspend fun execute(
@@ -117,6 +121,8 @@ private class AwaitCommand : DependencyWatchCommand(
 			versionNotifier = versionNotifier,
 			checkInterval = checkInterval,
 			debug = debug,
+			timestampSource = TimestampSource.System,
+			progress = System.out.takeUnless { quiet || !Terminal().info.interactive },
 		)
 		app.await(coordinate, version)
 	}
@@ -163,7 +169,7 @@ private class NotifyCommand(
 	@Suppress("USELESS_CAST") // Needed to keep the type abstract.
 	private val database by option("--data", metavar = "PATH")
 		.help("Directory into which already-seen versions are tracked (default in-memory)")
-		.path(canBeFile = false)
+		.path(canBeFile = false, fileSystem = fs)
 		.convert { FileSystemDatabase(it) as Database }
 		.defaultLazy { InMemoryDatabase() }
 

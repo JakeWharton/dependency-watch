@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: 17
+          java-version: 21
 
       - uses: crazy-max/ghaction-docker-meta@v1
         id: docker_meta

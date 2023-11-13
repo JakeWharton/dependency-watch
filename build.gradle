@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 buildscript {
 	repositories {
 		mavenCentral()
@@ -23,11 +25,13 @@ dependencies {
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion"
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion"
 	implementation 'org.tomlj:tomlj:1.1.0'
+	implementation 'org.jetbrains.kotlinx:kotlinx-datetime:0.3.2'
 	implementation "io.github.pdvrieze.xmlutil:core:$xmlUtilVersion"
 	implementation "io.github.pdvrieze.xmlutil:serialization:$xmlUtilVersion"
 	implementation 'com.github.ajalt.clikt:clikt:4.2.1'
 	implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
 	implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
+	implementation 'com.github.ajalt.mordant:mordant:2.2.0'
 
 	testImplementation 'junit:junit:4.13.2'
 	testImplementation 'com.google.truth:truth:1.1.5'
@@ -48,13 +52,25 @@ tasks.named("assemble").configure { task ->
 	task.dependsOn(tasks.named("installDist"))
 }
 
-tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile).configureEach { task ->
-	task.kotlinOptions {
-		jvmTarget = '1.8'
-		freeCompilerArgs += [
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile).configureEach { task ->
+	task.compilerOptions {
+		jvmTarget = JvmTarget.JVM_1_8
+		freeCompilerArgs.addAll(
 				'-progressive',
-				'-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
-				'-Xopt-in=nl.adaptivity.xmlutil.ExperimentalXmlUtilApi',
-		]
+				'-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
+				'-opt-in=nl.adaptivity.xmlutil.ExperimentalXmlUtilApi',
+		)
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	sourceCompatibility = JavaVersion.VERSION_1_8.toString()
+	targetCompatibility = JavaVersion.VERSION_1_8.toString()
+}
+
+test {
+	testLogging {
+		showStackTraces = true
+		exceptionFormat = 'full'
 	}
 }
