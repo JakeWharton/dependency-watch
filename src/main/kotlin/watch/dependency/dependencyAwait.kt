@@ -4,7 +4,7 @@ import java.io.PrintStream
 import kotlin.time.Duration
 import kotlinx.coroutines.delay
 
-internal const val cursorUpAndClearLine = "\u001B[F\u001B[K"
+internal const val CURSOR_UP_AND_CLEAR_LINE = "\u001B[F\u001B[K"
 
 class DependencyAwait(
 	private val mavenRepository: MavenRepository,
@@ -16,7 +16,7 @@ class DependencyAwait(
 ) {
 	suspend fun await(
 		coordinate: MavenCoordinate,
-		version: String
+		version: String,
 	) {
 		var needsClear = false
 		while (true) {
@@ -29,14 +29,16 @@ class DependencyAwait(
 			}
 
 			if (progress != null) {
-				progress.print(buildString {
-					if (needsClear) {
-						append(cursorUpAndClearLine)
-					}
-					append("Last checked: ")
-					append(timestampSource.now())
-					append('\n')
-				})
+				progress.print(
+					buildString {
+						if (needsClear) {
+							append(CURSOR_UP_AND_CLEAR_LINE)
+						}
+						append("Last checked: ")
+						append(timestampSource.now())
+						append('\n')
+					},
+				)
 				progress.flush()
 			}
 			needsClear = true
@@ -46,9 +48,11 @@ class DependencyAwait(
 		}
 
 		if (progress != null && needsClear) {
-			progress.print(buildString {
-				append(cursorUpAndClearLine)
-			})
+			progress.print(
+				buildString {
+					append(CURSOR_UP_AND_CLEAR_LINE)
+				},
+			)
 			progress.flush()
 		}
 

@@ -25,7 +25,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC
-import watch.dependency.RepositoryConfig.Companion.MavenCentralId
+import watch.dependency.RepositoryConfig.Companion.MAVEN_CENTRAL_ID
 
 fun main(vararg args: String) {
 	NoOpCliktCommand(name = "dependency-watch")
@@ -38,7 +38,7 @@ fun main(vararg args: String) {
 
 private abstract class DependencyWatchCommand(
 	name: String,
-	help: String = ""
+	help: String = "",
 ) : CliktCommand(name = name, help = help) {
 	protected val debug by option(hidden = true)
 		.switch<Debug>(mapOf("--debug" to Debug.Console))
@@ -91,12 +91,14 @@ private class AwaitCommand : DependencyWatchCommand(
 	help = "Wait for an artifact to appear in a Maven repository then exit",
 ) {
 	private val repo by option("--repo", metavar = "URL")
-		.help("""
+		.help(
+			"""
 			|URL or well-known ID of maven repository to check (default is "MavenCentral").
 			|Available well-known IDs: "MavenCentral", "GoogleMaven".
-			|""".trimMargin()
+			|
+			""".trimMargin(),
 		)
-		.default(MavenCentralId)
+		.default(MAVEN_CENTRAL_ID)
 
 	private val quiet by option("--quiet", "-q")
 		.flag()
@@ -129,13 +131,14 @@ private class AwaitCommand : DependencyWatchCommand(
 }
 
 private class NotifyCommand(
-	fs: FileSystem
+	fs: FileSystem,
 ) : DependencyWatchCommand(
 	name = "notify",
 	help = "Monitor Maven coordinates in a Maven repository for new versions",
 ) {
 	private val configPath by argument("CONFIG")
-		.help("""
+		.help(
+			"""
 			|TOML file containing repositories and coordinates to watch
 			|
 			|Format:
@@ -163,7 +166,9 @@ private class NotifyCommand(
 			|"MavenCentral" and "GoogleMaven" are two optional well-known repositories
 			|which only require a list of coordinates. Other repositories also require
 			|a host and can specify an optional name.
-			|""".trimMargin())
+			|
+			""".trimMargin(),
+		)
 		.path(fileSystem = fs)
 
 	@Suppress("USELESS_CAST") // Needed to keep the type abstract.

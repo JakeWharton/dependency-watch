@@ -2,7 +2,7 @@ FROM azul/zulu-openjdk:21-latest AS build
 ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dkotlin.incremental=false"
 WORKDIR /app
 
-COPY gradlew settings.gradle ./
+COPY gradlew settings.gradle .editorconfig ./
 COPY gradle ./gradle
 RUN ./gradlew --version
 

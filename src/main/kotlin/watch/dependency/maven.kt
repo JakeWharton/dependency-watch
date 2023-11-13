@@ -85,7 +85,7 @@ private class HttpMaven2Repository(
 		val metadata = xmlFormat.decodeFromString(ArtifactMetadata.serializer(), body)
 		return Versions(
 			latest = metadata.versioning.release,
-			all = metadata.versioning.versions.toSet()
+			all = metadata.versioning.versions.toSet(),
 		)
 	}
 
