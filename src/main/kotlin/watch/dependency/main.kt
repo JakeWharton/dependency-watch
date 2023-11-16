@@ -182,6 +182,10 @@ private class NotifyCommand(
 	private val watch by option("--watch").flag()
 		.help("Continually monitor for new versions every '--interval'")
 
+	private val quiet by option("--quiet", "-q")
+		.help("Hide 'Last checked' output")
+		.flag()
+
 	override suspend fun execute(
 		mavenRepositoryFactory: MavenRepository.Factory,
 		versionNotifier: VersionNotifier,
@@ -194,6 +198,8 @@ private class NotifyCommand(
 			versionNotifier = versionNotifier,
 			configPath = configPath,
 			debug = debug,
+			timestampSource = TimestampSource.System,
+			progress = System.out.takeUnless { quiet || !Terminal().info.interactive },
 		)
 		if (watch) {
 			notifier.monitor(checkInterval)

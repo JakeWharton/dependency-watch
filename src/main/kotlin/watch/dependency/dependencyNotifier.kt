@@ -1,5 +1,6 @@
 package watch.dependency
 
+import java.io.PrintStream
 import java.nio.file.Path
 import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.readText
@@ -15,6 +16,8 @@ class DependencyNotifier(
 	private val versionNotifier: VersionNotifier,
 	private val configPath: Path,
 	private val debug: Debug = Debug.Disabled,
+	private val timestampSource: TimestampSource,
+	private val progress: PrintStream?,
 ) {
 	private fun readRepositoryConfigs(): List<RepositoryConfig> {
 		val configs = RepositoryConfig.parseConfigsFromToml(configPath.readText())
@@ -49,6 +52,7 @@ class DependencyNotifier(
 	suspend fun monitor(checkInterval: Duration): Nothing {
 		var lastModified: Long? = null
 		var checkers = emptyList<DependencyChecker>()
+		var needsClear = false
 
 		while (true) {
 			// Parse the config inside the loop so you can edit it while running.
@@ -65,6 +69,21 @@ class DependencyNotifier(
 					}
 				}
 			}
+
+			if (progress != null) {
+				progress.print(
+					buildString {
+						if (needsClear) {
+							append(CURSOR_UP_AND_CLEAR_LINE)
+						}
+						append("Last checked: ")
+						append(timestampSource.now())
+						append('\n')
+					},
+				)
+				progress.flush()
+			}
+			needsClear = true
 
 			debug.log { "Sleeping $checkInterval..." }
 			delay(checkInterval)
@@ -96,6 +115,7 @@ private class DependencyChecker(
 						for (mavenVersion in versions.all) {
 							database.markCoordinateVersionSeen(coordinates, mavenVersion)
 						}
+
 						for (version in notifyVersions) {
 							versionNotifier.notify(mavenRepository.name, coordinates, version)
 						}
