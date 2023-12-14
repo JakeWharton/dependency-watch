@@ -3,7 +3,7 @@ kotlin = "1.9.21"
 okhttp = "4.12.0"
 kotlinx-coroutines = "1.7.3"
 kotlinx-serialization = "1.6.2"
-xmlutil = "0.86.2"
+xmlutil = "0.86.3"
 
 [libraries]
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
