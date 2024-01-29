@@ -53,6 +53,10 @@ private abstract class DependencyWatchCommand(
 		.help("IFTTT webhook URL to trigger (see https://ifttt.com/maker_webhooks)")
 		.convert { it.toHttpUrl() }
 
+	private val slack by option("--slack", metavar = "URL")
+		.help("Slack webhook URL to trigger (see https://api.slack.com/messaging/webhooks")
+		.convert { it.toHttpUrl() }
+
 	final override fun run() = runBlocking {
 		val okhttp = OkHttpClient.Builder()
 			.apply {
@@ -67,6 +71,9 @@ private abstract class DependencyWatchCommand(
 			add(ConsoleVersionNotifier)
 			ifttt?.let { ifttt ->
 				add(IftttVersionNotifier(okhttp, ifttt))
+			}
+			slack?.let { slack ->
+				add(SlackVersionNotifier(okhttp, slack))
 			}
 		}.flatten()
 

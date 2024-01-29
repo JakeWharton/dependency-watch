@@ -43,10 +43,20 @@ dependency-watch notify --data data config.toml
 The `notify` subcommand will check for any new versions once and then exit.
 Run with `--watch` to continuously check every minute. Use `--interval` to adjust the check period.
 
+### Slack
+
+The `--slack` option accepts a [Slack webhook URL](https://api.slack.com/messaging/webhooks) to
+notify when a new version is found.
+
+The message will look like this:
+
+> **New artifact in (repository name)**
+>
+> (version) of (groupId):(artifactId)
+
 ### IFTTT
 
-Both the `await` and `notify` subcommands print new versions to the console. The `--ifttt` option
-accepts an [IFTTT webhook URL](https://ifttt.com/maker_webhooks) to notify when a new version is
+The `--ifttt` option accepts an [IFTTT webhook URL](https://ifttt.com/maker_webhooks) to notify when a new version is
 found. This notification can then be redirected to Twitter, Slack, email, printers,
 light bulbs, and hundreds of other places.
 

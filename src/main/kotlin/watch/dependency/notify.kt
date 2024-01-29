@@ -73,3 +73,36 @@ class IftttVersionNotifier(
 		}
 	}
 }
+
+class SlackVersionNotifier(
+	private val okhttp: OkHttpClient,
+	private val url: HttpUrl,
+) : VersionNotifier {
+	override suspend fun notify(
+		repositoryName: String,
+		coordinate: MavenCoordinate,
+		version: String,
+	) {
+		val body = PostBody(
+			type = "mrkdwn",
+			text = """
+				|*New artifact in $repositoryName*
+				|
+				|$version of ${coordinate.groupId}:${coordinate.artifactId}
+			""".trimMargin(),
+		)
+		val call = okhttp.newCall(Request.Builder().url(url).post(body.toJson()).build())
+		call.await()
+	}
+
+	@Serializable
+	private data class PostBody(
+		val text: String,
+		val type: String,
+	) {
+		fun toJson(): RequestBody {
+			val json = Json.encodeToString(serializer(), this)
+			return json.toRequestBody("application/json".toMediaType())
+		}
+	}
+}
