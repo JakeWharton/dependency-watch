@@ -25,7 +25,7 @@ if [ -z "$HEALTHCHECK_ID" ]; then
 NOTE: Define HEALTHCHECK_ID with https://healthchecks.io to monitor sync job"
 fi
 
-if [ -z "$NOTIFY_IFTTT" -o -z "$NOTIFY_SLACK" ]; then
+if [ -z "$NOTIFY_IFTTT" ] || [ -z "$NOTIFY_SLACK" ]; then
 	echo "
 ERROR: 'NOTIFY_IFTTT' and 'NOTIFY_SLACK'environment variable not set"
 	exit 1
