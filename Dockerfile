@@ -42,6 +42,7 @@ ENV \
     PUID="" \
     PGID="" \
     NOTIFY_IFTTT="" \
+    NOTIFY_SLACK="" \
     DEPENDENCY_WATCH_ARGS=""
 COPY root/ /
 WORKDIR /app

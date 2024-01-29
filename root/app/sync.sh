@@ -10,6 +10,8 @@ set -e
 KNOWN_ARGS=""
 if [ -n "$NOTIFY_IFTTT" ]; then
 	KNOWN_ARGS="--ifttt $NOTIFY_IFTTT"
+fiif [ -n "$NOTIFY_SLACK" ]; then
+	KNOWN_ARGS="--slack $NOTIFY_SLACK"
 fi
 
 # shellcheck disable=SC2086
