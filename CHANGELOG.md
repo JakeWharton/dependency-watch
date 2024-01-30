@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+
+## [0.6.0] - 2024-01-29
+
+### Added
+
+ - New `--slack` parameter for a webhook URL that goes directly to a Slack channel. See https://api.slack.com/messaging/webhooks to set up.
+
+
 ## [0.5.0] - 2023-11-13
 
 ### Added
@@ -60,7 +68,8 @@
  - Initial release
 
 
-[Unreleased]: https://github.com/JakeWharton/dependency-watch/compare/0.5.0...HEAD
+[Unreleased]: https://github.com/JakeWharton/dependency-watch/compare/0.6.0...HEAD
+[0.6.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.6.0
 [0.5.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.5.0
 [0.4.1]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.4.1
 [0.4.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.4.0
