@@ -57,6 +57,10 @@ private abstract class DependencyWatchCommand(
 		.help("Slack webhook URL to trigger (see https://api.slack.com/messaging/webhooks")
 		.convert { it.toHttpUrl() }
 
+	private val teams by option("--teams", metavar = "URL")
+		.help("Teams webhook URL to trigger (see https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors")
+		.convert { it.toHttpUrl() }
+
 	final override fun run() = runBlocking {
 		val okhttp = OkHttpClient.Builder()
 			.apply {
@@ -74,6 +78,9 @@ private abstract class DependencyWatchCommand(
 			}
 			slack?.let { slack ->
 				add(SlackVersionNotifier(okhttp, slack))
+			}
+			teams?.let { teams ->
+				add(TeamsVersionNotifier(okhttp, teams))
 			}
 		}.flatten()
 

@@ -54,6 +54,17 @@ The message will look like this:
 >
 > (version) of (groupId):(artifactId)
 
+### Teams
+
+The `--teams` option accepts a [Teams webhook URL](https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors) to
+notify when a new version is found.
+
+The message will look like this:
+
+> **New artifact in (repository name)**
+>
+> (version) of (groupId):(artifactId)
+
 ### IFTTT
 
 The `--ifttt` option accepts an [IFTTT webhook URL](https://ifttt.com/maker_webhooks) to notify when a new version is
