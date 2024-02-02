@@ -120,7 +120,6 @@ class TeamsVersionNotifier(
 		val body = PostBody(
 			type = "MessageCard",
 			context = "http://schema.org/extensions",
-			themeColor = "0076D7",
 			summary = "New $version of ${coordinate.groupId}:${coordinate.artifactId} available in $repositoryName",
 			sections = listOf(
 				PostBodySection(
@@ -143,7 +142,6 @@ class TeamsVersionNotifier(
 	private data class PostBody(
 		@SerialName("@type") val type: String,
 		@SerialName("@context") val context: String,
-		val themeColor: String,
 		val summary: String,
 		val sections: List<PostBodySection>,
 	) {

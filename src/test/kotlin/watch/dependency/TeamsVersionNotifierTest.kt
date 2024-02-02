@@ -25,7 +25,7 @@ class TeamsVersionNotifierTest {
 
 		// Then
 		assertThat(request.body.readUtf8())
-			.isEqualTo("""{"@type":"MessageCard","@context":"http://schema.org/extensions","themeColor":"0076D7","summary":"New 1.1.0 of com.example:example available in Repo","sections":[{"activityTitle":"*New artifact in Repo*","activitySubtitle":"1.1.0 of com.example:example"}]}""")
+			.isEqualTo("""{"@type":"MessageCard","@context":"http://schema.org/extensions","summary":"New 1.1.0 of com.example:example available in Repo","sections":[{"activityTitle":"*New artifact in Repo*","activitySubtitle":"1.1.0 of com.example:example"}]}""")
 		assertThat(request.requestUrl).isEqualTo(serverUrl)
 	}
 }
