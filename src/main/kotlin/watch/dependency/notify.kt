@@ -124,7 +124,7 @@ class TeamsVersionNotifier(
 			sections = listOf(
 				PostBodySection(
 					activityTitle = "*New artifact in $repositoryName*",
-					activitySubtitle = "$version of ${coordinate.groupId}:${coordinate.artifactId}"
+					activitySubtitle = "$version of ${coordinate.groupId}:${coordinate.artifactId}",
 				),
 			),
 		)
