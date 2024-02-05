@@ -14,6 +14,9 @@ fi
 if [ -n "$NOTIFY_SLACK" ]; then
 	KNOWN_ARGS="$KNOWN_ARGS --slack $NOTIFY_SLACK"
 fi
+if [ -n "$NOTIFY_TEAMS" ]; then
+	KNOWN_ARGS="$KNOWN_ARGS --teams $NOTIFY_TEAMS"
+fi
 
 # shellcheck disable=SC2086
 /app/bin/dependency-watch notify \

@@ -43,6 +43,7 @@ ENV \
     PGID="" \
     NOTIFY_IFTTT="" \
     NOTIFY_SLACK="" \
+    NOTIFY_TEAMS="" \
     DEPENDENCY_WATCH_ARGS=""
 COPY root/ /
 WORKDIR /app

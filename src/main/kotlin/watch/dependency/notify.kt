@@ -1,5 +1,6 @@
 package watch.dependency
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
@@ -99,6 +100,50 @@ class SlackVersionNotifier(
 	private data class PostBody(
 		val text: String,
 		val type: String,
+	) {
+		fun toJson(): RequestBody {
+			val json = Json.encodeToString(serializer(), this)
+			return json.toRequestBody("application/json".toMediaType())
+		}
+	}
+}
+
+class TeamsVersionNotifier(
+	private val okhttp: OkHttpClient,
+	private val url: HttpUrl,
+) : VersionNotifier {
+	override suspend fun notify(
+		repositoryName: String,
+		coordinate: MavenCoordinate,
+		version: String,
+	) {
+		val body = PostBody(
+			type = "MessageCard",
+			context = "http://schema.org/extensions",
+			summary = "New $version of ${coordinate.groupId}:${coordinate.artifactId} available in $repositoryName",
+			sections = listOf(
+				PostBodySection(
+					activityTitle = "*New artifact in $repositoryName*",
+					activitySubtitle = "$version of ${coordinate.groupId}:${coordinate.artifactId}",
+				),
+			),
+		)
+		val call = okhttp.newCall(Request.Builder().url(url).post(body.toJson()).build())
+		call.await()
+	}
+
+	@Serializable
+	private data class PostBodySection(
+		val activityTitle: String,
+		val activitySubtitle: String,
+	)
+
+	@Serializable
+	private data class PostBody(
+		@SerialName("@type") val type: String,
+		@SerialName("@context") val context: String,
+		val summary: String,
+		val sections: List<PostBodySection>,
 	) {
 		fun toJson(): RequestBody {
 			val json = Json.encodeToString(serializer(), this)
