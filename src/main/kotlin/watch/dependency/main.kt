@@ -16,6 +16,9 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
 import com.github.ajalt.clikt.parameters.types.path
 import com.github.ajalt.mordant.terminal.Terminal
+import java.net.InetSocketAddress
+import java.net.Proxy
+import java.net.URI
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import kotlin.time.Duration
@@ -66,6 +69,11 @@ private abstract class DependencyWatchCommand(
 			.apply {
 				if (debug.enabled) {
 					addNetworkInterceptor(HttpLoggingInterceptor(debug::log).setLevel(BASIC))
+				}
+				System.getenv("https_proxy")?.let {
+					URI.create(it).apply {
+						proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress(host, port)))
+					}
 				}
 			}
 			.build()
