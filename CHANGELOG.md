@@ -7,7 +7,7 @@
 
 ### Added
 
- - New `--teams` parameter for a webhook URL that goes directly to a Slack channel. See https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors to set up.
+ - New `--teams` parameter for a webhook URL that goes directly to a Microsoft Teams channel. See https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors to set up.
  - Honor `https_proxy` environment variable for configuring a proxy.
 
 
