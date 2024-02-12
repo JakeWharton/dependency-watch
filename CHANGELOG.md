@@ -3,6 +3,14 @@
 ## [Unreleased]
 
 
+## [0.7.0] - 2024-02-12
+
+### Added
+
+ - New `--teams` parameter for a webhook URL that goes directly to a Slack channel. See https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors to set up.
+ - Honor `https_proxy` environment variable for configuring a proxy.
+
+
 ## [0.6.0] - 2024-01-29
 
 ### Added
@@ -68,7 +76,8 @@
  - Initial release
 
 
-[Unreleased]: https://github.com/JakeWharton/dependency-watch/compare/0.6.0...HEAD
+[Unreleased]: https://github.com/JakeWharton/dependency-watch/compare/0.7.0...HEAD
+[0.7.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.7.0
 [0.6.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.6.0
 [0.5.0]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.5.0
 [0.4.1]: https://github.com/JakeWharton/dependency-watch/releases/tag/0.4.1
