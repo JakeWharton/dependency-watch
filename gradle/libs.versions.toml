@@ -1,7 +1,7 @@
 [versions]
 kotlin = "1.9.22"
 okhttp = "4.12.0"
-kotlinx-coroutines = "1.7.3"
+kotlinx-coroutines = "1.8.0"
 kotlinx-serialization = "1.6.2"
 xmlutil = "0.86.3"
 
