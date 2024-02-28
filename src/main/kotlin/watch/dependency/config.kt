@@ -50,9 +50,11 @@ data class RepositoryConfig(
 			for (key in keySet()) {
 				when (key) {
 					TOML_KEY_COORDINATES -> coordinates = getCoordinates(key)
+
 					TOML_KEY_NAME, TOML_KEY_HOST, TOML_KEY_TYPE -> {
 						throw IllegalArgumentException("'$self' table must not define a '$key' key")
 					}
+
 					else -> throw IllegalArgumentException("'$self' table contains unknown '$key' key")
 				}
 			}
