@@ -108,10 +108,11 @@ private abstract class DependencyWatchCommand(
 	)
 }
 
-private class AwaitCommand : DependencyWatchCommand(
-	name = "await",
-	help = "Wait for an artifact to appear in a Maven repository then exit",
-) {
+private class AwaitCommand :
+	DependencyWatchCommand(
+		name = "await",
+		help = "Wait for an artifact to appear in a Maven repository then exit",
+	) {
 	private val repo by option("--repo", metavar = "URL")
 		.help(
 			"""
