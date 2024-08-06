@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.0.0"
+kotlin = "2.0.10"
 okhttp = "4.12.0"
 kotlinx-coroutines = "1.8.1"
 kotlinx-serialization = "1.7.1"
