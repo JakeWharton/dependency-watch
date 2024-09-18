@@ -3,7 +3,9 @@
 package watch.dependency
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.NoOpCliktCommand
+import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.help
@@ -39,10 +41,7 @@ fun main(vararg args: String) {
 		.main(args)
 }
 
-private abstract class DependencyWatchCommand(
-	name: String,
-	help: String = "",
-) : CliktCommand(name = name, help = help) {
+private abstract class DependencyWatchCommand(name: String) : CliktCommand(name) {
 	protected val debug by option(hidden = true)
 		.switch<Debug>(mapOf("--debug" to Debug.Console))
 		.default(Debug.Disabled)
@@ -108,11 +107,10 @@ private abstract class DependencyWatchCommand(
 	)
 }
 
-private class AwaitCommand :
-	DependencyWatchCommand(
-		name = "await",
-		help = "Wait for an artifact to appear in a Maven repository then exit",
-	) {
+private class AwaitCommand : DependencyWatchCommand("await") {
+	override fun help(context: Context) =
+		"Wait for an artifact to appear in a Maven repository then exit"
+
 	private val repo by option("--repo", metavar = "URL")
 		.help(
 			"""
@@ -156,10 +154,10 @@ private class AwaitCommand :
 
 private class NotifyCommand(
 	fs: FileSystem,
-) : DependencyWatchCommand(
-	name = "notify",
-	help = "Monitor Maven coordinates in a Maven repository for new versions",
-) {
+) : DependencyWatchCommand("notify") {
+	override fun help(context: Context) =
+		"Monitor Maven coordinates in a Maven repository for new versions"
+
 	private val configPath by argument("CONFIG")
 		.help(
 			"""
