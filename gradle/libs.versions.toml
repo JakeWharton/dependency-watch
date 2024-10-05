@@ -30,7 +30,7 @@ xmlutil-serialization = { module = "io.github.pdvrieze.xmlutil:serialization", v
 
 mordant = "com.github.ajalt.mordant:mordant:3.0.0"
 tomlj = "org.tomlj:tomlj:1.1.1"
-clikt = "com.github.ajalt.clikt:clikt:5.0.0"
+clikt = "com.github.ajalt.clikt:clikt:5.0.1"
 
 junit = "junit:junit:4.13.2"
 truth = "com.google.truth:truth:1.4.4"
