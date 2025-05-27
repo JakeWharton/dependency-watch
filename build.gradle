@@ -15,7 +15,9 @@ apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
 apply plugin: 'application'
 
-mainClassName = 'watch.dependency.Main'
+application {
+	mainClass = 'watch.dependency.Main'
+}
 
 dependencies {
 	implementation libs.kotlinx.coroutines.core
