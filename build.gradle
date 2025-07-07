@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 buildscript {
 	repositories {
@@ -51,11 +52,12 @@ tasks.named("assemble").configure { task ->
 	task.dependsOn(tasks.named("installDist"))
 }
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile).configureEach { task ->
+tasks.withType(KotlinJvmCompile).configureEach { task ->
 	task.compilerOptions {
 		jvmTarget = JvmTarget.JVM_1_8
 		freeCompilerArgs.addAll(
 				'-progressive',
+				'-opt-in=kotlin.time.ExperimentalTime',
 				'-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
 				'-opt-in=nl.adaptivity.xmlutil.ExperimentalXmlUtilApi',
 		)
