@@ -108,8 +108,7 @@ private abstract class DependencyWatchCommand(name: String) : CliktCommand(name)
 }
 
 private class AwaitCommand : DependencyWatchCommand("await") {
-	override fun help(context: Context) =
-		"Wait for an artifact to appear in a Maven repository then exit"
+	override fun help(context: Context) = "Wait for an artifact to appear in a Maven repository then exit"
 
 	private val repo by option("--repo", metavar = "URL")
 		.help(
@@ -155,8 +154,7 @@ private class AwaitCommand : DependencyWatchCommand("await") {
 private class NotifyCommand(
 	fs: FileSystem,
 ) : DependencyWatchCommand("notify") {
-	override fun help(context: Context) =
-		"Monitor Maven coordinates in a Maven repository for new versions"
+	override fun help(context: Context) = "Monitor Maven coordinates in a Maven repository for new versions"
 
 	private val configPath by argument("CONFIG")
 		.help(
