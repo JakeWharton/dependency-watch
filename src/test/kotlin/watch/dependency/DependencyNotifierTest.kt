@@ -1,7 +1,9 @@
 package watch.dependency
 
+import assertk.assertThat
+import assertk.assertions.containsExactly
+import assertk.assertions.isEmpty
 import com.google.common.jimfs.Jimfs
-import com.google.common.truth.Truth.assertThat
 import kotlin.io.path.writeText
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.launch

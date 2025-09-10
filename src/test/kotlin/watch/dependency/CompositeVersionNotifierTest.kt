@@ -1,6 +1,7 @@
 package watch.dependency
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.containsExactly
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 

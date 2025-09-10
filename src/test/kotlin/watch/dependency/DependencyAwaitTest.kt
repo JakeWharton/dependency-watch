@@ -1,6 +1,9 @@
 package watch.dependency
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.containsExactly
+import assertk.assertions.isEmpty
+import assertk.assertions.isEqualTo
 import java.io.PrintStream
 import java.util.Locale
 import kotlin.time.Clock

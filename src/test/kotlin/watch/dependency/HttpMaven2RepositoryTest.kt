@@ -1,6 +1,8 @@
 package watch.dependency
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNull
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
