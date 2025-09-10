@@ -1,6 +1,7 @@
 package watch.dependency
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.hasMessage
 import kotlin.test.assertFailsWith
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
@@ -64,7 +65,7 @@ class ConfigTest {
 				""".trimMargin(),
 			)
 		}
-		assertThat(t).hasMessageThat().isEqualTo("'MavenCentral' table missing required 'coordinates' key")
+		assertThat(t).hasMessage("'MavenCentral' table missing required 'coordinates' key")
 	}
 
 	@Test fun mavenCentralNonArrayCoordinatesThrows() {
@@ -105,7 +106,7 @@ class ConfigTest {
 				""".trimMargin(),
 			)
 		}
-		assertThat(t).hasMessageThat().isEqualTo("'MavenCentral' table must not define a 'name' key")
+		assertThat(t).hasMessage("'MavenCentral' table must not define a 'name' key")
 	}
 
 	@Test fun mavenCentralHostThrows() {
@@ -122,7 +123,7 @@ class ConfigTest {
 				""".trimMargin(),
 			)
 		}
-		assertThat(t).hasMessageThat().isEqualTo("'MavenCentral' table must not define a 'host' key")
+		assertThat(t).hasMessage("'MavenCentral' table must not define a 'host' key")
 	}
 
 	@Test fun mavenCentralTypeThrows() {
@@ -139,7 +140,7 @@ class ConfigTest {
 				""".trimMargin(),
 			)
 		}
-		assertThat(t).hasMessageThat().isEqualTo("'MavenCentral' table must not define a 'type' key")
+		assertThat(t).hasMessage("'MavenCentral' table must not define a 'type' key")
 	}
 
 	@Test fun mavenCentralUnknownKeyThrows() {
@@ -156,7 +157,7 @@ class ConfigTest {
 				""".trimMargin(),
 			)
 		}
-		assertThat(t).hasMessageThat().isEqualTo("'MavenCentral' table contains unknown 'foo' key")
+		assertThat(t).hasMessage("'MavenCentral' table contains unknown 'foo' key")
 	}
 
 	@Test fun mavenCentralChildTableThrows() {
@@ -173,7 +174,7 @@ class ConfigTest {
 				""".trimMargin(),
 			)
 		}
-		assertThat(t).hasMessageThat().isEqualTo("'MavenCentral' table contains unknown 'Foo' key")
+		assertThat(t).hasMessage("'MavenCentral' table contains unknown 'Foo' key")
 	}
 
 	@Test fun googleMaven() {
@@ -221,7 +222,7 @@ class ConfigTest {
 				""".trimMargin(),
 			)
 		}
-		assertThat(t).hasMessageThat().isEqualTo("'GoogleMaven' table missing required 'coordinates' key")
+		assertThat(t).hasMessage("'GoogleMaven' table missing required 'coordinates' key")
 	}
 
 	@Test fun googleMavenNonArrayCoordinatesThrows() {
@@ -262,7 +263,7 @@ class ConfigTest {
 				""".trimMargin(),
 			)
 		}
-		assertThat(t).hasMessageThat().isEqualTo("'GoogleMaven' table must not define a 'name' key")
+		assertThat(t).hasMessage("'GoogleMaven' table must not define a 'name' key")
 	}
 
 	@Test fun googleMavenHostThrows() {
@@ -279,7 +280,7 @@ class ConfigTest {
 				""".trimMargin(),
 			)
 		}
-		assertThat(t).hasMessageThat().isEqualTo("'GoogleMaven' table must not define a 'host' key")
+		assertThat(t).hasMessage("'GoogleMaven' table must not define a 'host' key")
 	}
 
 	@Test fun googleMavenTypeThrows() {
@@ -296,7 +297,7 @@ class ConfigTest {
 				""".trimMargin(),
 			)
 		}
-		assertThat(t).hasMessageThat().isEqualTo("'GoogleMaven' table must not define a 'type' key")
+		assertThat(t).hasMessage("'GoogleMaven' table must not define a 'type' key")
 	}
 
 	@Test fun googleMavenUnknownKeyThrows() {
@@ -313,7 +314,7 @@ class ConfigTest {
 				""".trimMargin(),
 			)
 		}
-		assertThat(t).hasMessageThat().isEqualTo("'GoogleMaven' table contains unknown 'foo' key")
+		assertThat(t).hasMessage("'GoogleMaven' table contains unknown 'foo' key")
 	}
 
 	@Test fun googleMavenChildTableThrows() {
@@ -330,7 +331,7 @@ class ConfigTest {
 				""".trimMargin(),
 			)
 		}
-		assertThat(t).hasMessageThat().isEqualTo("'GoogleMaven' table contains unknown 'Foo' key")
+		assertThat(t).hasMessage("'GoogleMaven' table contains unknown 'Foo' key")
 	}
 
 	@Test fun customRepo() {
@@ -471,7 +472,7 @@ class ConfigTest {
 				""".trimMargin(),
 			)
 		}
-		assertThat(t).hasMessageThat().isEqualTo("'CustomRepo' table missing required 'host' key")
+		assertThat(t).hasMessage("'CustomRepo' table missing required 'host' key")
 	}
 
 	@Test fun customRepoNonStringHostThrows() {
@@ -500,7 +501,7 @@ class ConfigTest {
 				""".trimMargin(),
 			)
 		}
-		assertThat(t).hasMessageThat().isEqualTo("'CustomRepo' table missing required 'coordinates' key")
+		assertThat(t).hasMessage("'CustomRepo' table missing required 'coordinates' key")
 	}
 
 	@Test fun customRepoNonArrayCoordinatesThrows() {
@@ -542,6 +543,6 @@ class ConfigTest {
 				""".trimMargin(),
 			)
 		}
-		assertThat(t).hasMessageThat().isEqualTo("No enum constant watch.dependency.RepositoryType.MavenTwo")
+		assertThat(t).hasMessage("No enum constant watch.dependency.RepositoryType.MavenTwo")
 	}
 }
