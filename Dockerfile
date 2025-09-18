@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk:21-latest AS build
+FROM azul/zulu-openjdk:25-latest AS build
 ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dkotlin.incremental=false"
 WORKDIR /app
 
