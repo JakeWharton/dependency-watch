@@ -28,10 +28,11 @@ jobs:
           images: |
             jakewharton/dependency-watch
             ghcr.io/jakewharton/dependency-watch
-          tag-semver: |
-            {{version}}
-            {{major}}
-            {{major}}.{{minor}}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}
+            type=semver,pattern={{major}}.{{minor}}
 
       - uses: docker/login-action@v3
         with:
