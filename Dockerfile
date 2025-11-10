@@ -39,8 +39,6 @@ ENV \
     CRON="" \
     HEALTHCHECK_ID="" \
     HEALTHCHECK_HOST="https://hc-ping.com" \
-    PUID="" \
-    PGID="" \
     NOTIFY_IFTTT="" \
     NOTIFY_SLACK="" \
     NOTIFY_TEAMS="" \
