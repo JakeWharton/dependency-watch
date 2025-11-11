@@ -4,12 +4,14 @@ import io.github.kevincianfarini.cardiologist.Pulse
 import io.github.kevincianfarini.cardiologist.PulseBackpressureStrategy.Companion.SkipNext
 import java.nio.file.FileVisitResult.CONTINUE
 import java.nio.file.Path
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
 import kotlin.io.path.visitFileTree
 import kotlinx.coroutines.CoroutineStart.UNDISPATCHED
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
@@ -79,15 +81,22 @@ internal class DependencyNotifier(
 				checkers = readRepositoryConfigs().map(::createChecker)
 			}
 
-			supervisorScope {
-				for (checker in checkers) {
-					launch {
-						checker.check()
+			try {
+				coroutineScope {
+					for (checker in checkers) {
+						launch {
+							checker.check()
+						}
 					}
 				}
-			}
 
-			started?.complete()
+				started?.complete()
+			} catch (e: Exception) {
+				if (e is CancellationException) {
+					throw e
+				}
+				e.printStackTrace()
+			}
 		}
 
 		// https://github.com/kevincianfarini/cardiologist/issues/117
@@ -103,7 +112,7 @@ private class DependencyChecker(
 	private val debug: Debug,
 ) {
 	suspend fun check() {
-		supervisorScope {
+		coroutineScope {
 			for (coordinates in coordinates) {
 				launch(start = UNDISPATCHED) {
 					debug.log { "Fetching metadata for $coordinates..." }
