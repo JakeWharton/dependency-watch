@@ -95,11 +95,12 @@ run `bin/dependency-watch` or `bin/dependency-watch.bat`.
 
 The container runs the tool using cron on a specified schedule and will notify IFTTT.
 
-[![Docker Image Version](https://img.shields.io/docker/v/jakewharton/dependency-watch?sort=semver)][hub]
-[![Docker Image Size](https://img.shields.io/docker/image-size/jakewharton/dependency-watch)][layers]
+[![Latest released Docker image version](https://img.shields.io/docker/v/jakewharton/dependency-watch?sort=semver&style=flat-square)][hub]
+[![Latest released Docker image size](https://img.shields.io/docker/image-size/jakewharton/dependency-watch?sort=semver&style=flat-square)][hub]<br>
+[![Trunk Docker image version](https://img.shields.io/docker/v/jakewharton/dependency-watch/trunk?style=flat-square)][hub]
+[![Trunk Docker image size](https://img.shields.io/docker/image-size/jakewharton/dependency-watch/trunk?style=flat-square)][hub]
 
  [hub]: https://hub.docker.com/r/jakewharton/dependency-watch/
- [layers]: https://microbadger.com/images/jakewharton/dependency-watch
 
 The container looks in `/config` for all `*.toml` files.
 
