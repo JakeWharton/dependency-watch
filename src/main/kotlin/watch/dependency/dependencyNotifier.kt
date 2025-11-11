@@ -1,15 +1,19 @@
 package watch.dependency
 
+import io.github.kevincianfarini.cardiologist.Pulse
+import io.github.kevincianfarini.cardiologist.PulseBackpressureStrategy.Companion.SkipNext
+import java.nio.file.FileVisitResult.CONTINUE
 import java.nio.file.Path
+import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
-import kotlin.time.Duration
+import kotlin.io.path.visitFileTree
 import kotlinx.coroutines.CoroutineStart.UNDISPATCHED
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
-class DependencyNotifier(
+internal class DependencyNotifier(
 	private val mavenRepositoryFactory: MavenRepository.Factory,
 	private val database: Database,
 	private val versionNotifier: VersionNotifier,
@@ -17,7 +21,19 @@ class DependencyNotifier(
 	private val debug: Debug = Debug.Disabled,
 ) {
 	private fun readRepositoryConfigs(): List<RepositoryConfig> {
-		val configs = RepositoryConfig.parseConfigsFromToml(configPath.readText())
+		val configs = mutableListOf<RepositoryConfig>()
+		configPath.visitFileTree(maxDepth = 1) {
+			onVisitFile { file, _ ->
+				if (file.isRegularFile() && file.extension == "toml") {
+					debug.log { "Reading config $file" }
+					configs += RepositoryConfig.parseConfigsFromToml(file.readText())
+				}
+				CONTINUE
+			}
+		}
+		if (configs.isEmpty()) {
+			debug.log { "No configs found!" }
+		}
 		for (config in configs) {
 			debug.log { config.toString() }
 		}
@@ -46,11 +62,16 @@ class DependencyNotifier(
 		}
 	}
 
-	suspend fun monitor(checkInterval: Duration): Nothing {
+	suspend fun monitor(
+		pulse: Pulse,
+		healthCheck: HealthCheck? = null,
+	): Nothing {
 		var lastModified: Long? = null
 		var checkers = emptyList<DependencyChecker>()
 
-		while (true) {
+		pulse.beat(strategy = SkipNext) {
+			val started = healthCheck?.start()
+
 			// Parse the config inside the loop so you can edit it while running.
 			val newLastModified = configPath.getLastModifiedTime().toMillis()
 			if (newLastModified != lastModified) {
@@ -66,9 +87,11 @@ class DependencyNotifier(
 				}
 			}
 
-			debug.log { "Sleeping $checkInterval..." }
-			delay(checkInterval)
+			started?.complete()
 		}
+
+		// https://github.com/kevincianfarini/cardiologist/issues/117
+		throw AssertionError()
 	}
 }
 

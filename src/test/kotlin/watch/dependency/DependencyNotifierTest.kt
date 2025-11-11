@@ -4,12 +4,15 @@ import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.isEmpty
 import com.google.common.jimfs.Jimfs
+import io.github.kevincianfarini.cardiologist.fixedPeriodPulse
 import kotlin.io.path.writeText
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.asClock
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Test
@@ -45,7 +48,7 @@ class DependencyNotifierTest {
 		notifier.run()
 		assertThat(versionNotifier.notifications).isEmpty()
 
-		val mavenCentral = mavenRepositories[MAVEN_CENTRAL_HOST]!!
+		val mavenCentral = mavenRepositories.getValue(MAVEN_CENTRAL_HOST)
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 
 		notifier.run()
@@ -75,7 +78,7 @@ class DependencyNotifierTest {
 		notifier.run()
 		assertThat(versionNotifier.notifications).isEmpty()
 
-		val mavenCentral = mavenRepositories[MAVEN_CENTRAL_HOST]!!
+		val mavenCentral = mavenRepositories.getValue(MAVEN_CENTRAL_HOST)
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 		val customRepository = mavenRepositories[customHost]!!
 		customRepository.addArtifact(MavenCoordinate("com.example", "example-b"), "1.0")
@@ -99,13 +102,15 @@ class DependencyNotifierTest {
 		)
 
 		val monitorJob = launch {
-			notifier.monitor(5.seconds)
+			val testClock = testScheduler.timeSource.asClock(Instant.fromEpochMilliseconds(0L))
+			notifier.monitor(testClock.fixedPeriodPulse(5.seconds))
 		}
 
+		advanceTimeBy(5.seconds) // No longer checks immediately.
 		runCurrent()
 		assertThat(versionNotifier.notifications).isEmpty()
 
-		val mavenCentral = mavenRepositories[MAVEN_CENTRAL_HOST]!!
+		val mavenCentral = mavenRepositories.getValue(MAVEN_CENTRAL_HOST)
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 
 		advanceTimeBy(5.seconds)
@@ -136,15 +141,17 @@ class DependencyNotifierTest {
 		)
 
 		val monitorJob = launch {
-			notifier.monitor(5.seconds)
+			val testClock = testScheduler.timeSource.asClock(Instant.fromEpochMilliseconds(0L))
+			notifier.monitor(testClock.fixedPeriodPulse(5.seconds))
 		}
 
+		advanceTimeBy(5.seconds) // No longer checks immediately.
 		runCurrent()
 		assertThat(versionNotifier.notifications).isEmpty()
 
-		val mavenCentral = mavenRepositories[MAVEN_CENTRAL_HOST]!!
+		val mavenCentral = mavenRepositories.getValue(MAVEN_CENTRAL_HOST)
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
-		val customRepository = mavenRepositories[customHost]!!
+		val customRepository = mavenRepositories.getValue(customHost)
 		customRepository.addArtifact(MavenCoordinate("com.example", "example-b"), "1.0")
 
 		advanceTimeBy(5.seconds)
@@ -168,13 +175,15 @@ class DependencyNotifierTest {
 		)
 
 		val monitorJob = launch {
-			notifier.monitor(5.seconds)
+			val testClock = testScheduler.timeSource.asClock(Instant.fromEpochMilliseconds(0L))
+			notifier.monitor(testClock.fixedPeriodPulse(5.seconds))
 		}
 
+		advanceTimeBy(5.seconds) // No longer checks immediately.
 		runCurrent()
 		assertThat(versionNotifier.notifications).isEmpty()
 
-		val mavenCentral = mavenRepositories[MAVEN_CENTRAL_HOST]!!
+		val mavenCentral = mavenRepositories.getValue(MAVEN_CENTRAL_HOST)
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.1")
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.2")
@@ -200,13 +209,15 @@ class DependencyNotifierTest {
 		)
 
 		val monitorJob = launch {
-			notifier.monitor(5.seconds)
+			val testClock = testScheduler.timeSource.asClock(Instant.fromEpochMilliseconds(0L))
+			notifier.monitor(testClock.fixedPeriodPulse(5.seconds))
 		}
 
+		advanceTimeBy(5.seconds) // No longer checks immediately.
 		runCurrent()
 		assertThat(versionNotifier.notifications).isEmpty()
 
-		val mavenCentral = mavenRepositories[MAVEN_CENTRAL_HOST]!!
+		val mavenCentral = mavenRepositories.getValue(MAVEN_CENTRAL_HOST)
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.1")
 
@@ -246,9 +257,11 @@ class DependencyNotifierTest {
 		mavenCentral.addArtifact(MavenCoordinate("com.example", "example-a"), "1.0")
 
 		val monitorJob = launch {
-			notifier.monitor(5.seconds)
+			val testClock = testScheduler.timeSource.asClock(Instant.fromEpochMilliseconds(0L))
+			notifier.monitor(testClock.fixedPeriodPulse(5.seconds))
 		}
 
+		advanceTimeBy(5.seconds) // No longer checks immediately.
 		runCurrent()
 		assertThat(versionNotifier.notifications).containsExactly(
 			"Maven Central com.example:example-a:1.0",

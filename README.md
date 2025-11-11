@@ -35,13 +35,13 @@ coordinates = [
 ]
 ```
 
-Pass the config file and a `--data` directory to store already-seen versions across invocations:
+Pass the TOML to `--config`, and include `--data` directory to store already-seen versions across invocations:
 ```
-dependency-watch notify --data data config.toml
+dependency-watch notify --config config.toml --data data
 ```
 
 The `notify` subcommand will check for any new versions once and then exit.
-Run with `--watch` to continuously check every minute. Use `--interval` to adjust the check period.
+Run with `--cron` to continuously check on the given schedule.
 
 ### Slack
 
@@ -101,38 +101,37 @@ The container runs the tool using cron on a specified schedule and will notify I
  [hub]: https://hub.docker.com/r/jakewharton/dependency-watch/
  [layers]: https://microbadger.com/images/jakewharton/dependency-watch
 
-The container looks in `/config` for any `*.toml` files, but only one is supported.
+The container looks in `/config` for all `*.toml` files.
 
 ```
 docker run -it --rm
     -v /path/to/config:/config \
     -v /path/to/data:/data \
-    -e "CRON=0 * * * *" \
-    -e "NOTIFY_IFTTT=..." \
-    jakewharton/dependency-watch:0.4
+    jakewharton/dependency-watch:0.4 \
+    notify \
+    --cron "*/5 * * * *" \
+    --ifttt https://...
 ```
 
 To be notified when sync is failing visit https://healthchecks.io, create a check, and specify
-the ID to the container using the `HEALTHCHECK_ID` environment variable.
+the ID to the container using the `DEPENDENCY_WATCH_HEALTHCHECK_ID` environment variable.
 
 ### Docker Compose
 
 ```yaml
-version: '2'
 services:
   dependency-watch:
     image: jakewharton/dependency-watch:0.5
+    command: notify
     restart: unless-stopped
     volumes:
       - /path/to/config:/config
       - /path/to/data:/data
     environment:
-      - "CRON=0 * * * *"
-      - "NOTIFY_IFTTT=..."
+      - "DEPENDENCY_WATCH_CRON=*/5 * * * *"
       #Optional:
-      - "HEALTHCHECK_ID=..."
-      - "PUID=..."
-      - "PGID=..."
+      - "DEPENDENCY_WATCH_IFTTT=..."
+      - "DEPENDENCY_WATCH_HC_ID=..."
 ```
 
 ## Usage

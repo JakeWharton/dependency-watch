@@ -32,6 +32,7 @@ dependencies {
 	implementation libs.okhttp.client
 	implementation libs.okhttp.logging
 	implementation libs.mordant
+	implementation libs.cardiologist
 
 	testImplementation libs.junit
 	testImplementation libs.assertk

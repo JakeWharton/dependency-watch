@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Changed
+
+ - Multiple config TOML files can be loaded from a directory.
+ - Docker container environment variables are now prefixed with `DEPENDENCY_WATCH_`.
+ - `notify` subcommand now uses `--cron` instead of `--interval`. The Docker container always supported this, but now it has moved to the underlying command.
+ - `notify` subcommand now supports notifying Healthchecks.io. The Docker container always supported this, but it has now moved to the underlying command.
+ - `notify` subcommand configuration is now loaded with `--config` option instead of positional argument.
+ - Docker container can now run the full CLI instead of previously only supporting `notify`+cron.
+
 
 ## [0.7.0] - 2024-02-12
 
