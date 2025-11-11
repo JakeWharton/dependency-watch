@@ -1,4 +1,4 @@
-FROM alpine:3.22.1 AS build
+FROM alpine:3.22.2 AS build
 ENV GRADLE_OPTS="-Dkotlin.incremental=false -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false -Dorg.gradle.logging.stacktrace=full"
 
 RUN apk add --no-cache \
@@ -18,7 +18,7 @@ COPY build.gradle ./
 COPY src/main ./src/main
 RUN ./gradlew installDist
 
-FROM alpine:3.22.1
+FROM alpine:3.22.2
 LABEL maintainer="Jake Wharton <docker@jakewharton.com>"
 
 RUN apk add --no-cache \
