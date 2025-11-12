@@ -27,7 +27,7 @@ internal class HealthCheck(
 			.addPathSegment("start")
 			.build()
 
-		client.newCall(Request(url = startUrl, method = "POST", body = RequestBody.EMPTY)).execute()
+		client.newCall(Request(url = startUrl, method = "POST", body = RequestBody.EMPTY)).execute().close()
 
 		return Started(url, client)
 	}
@@ -37,7 +37,7 @@ internal class HealthCheck(
 		private val client: OkHttpClient,
 	) {
 		fun complete() {
-			client.newCall(Request(url = url, method = "POST", body = RequestBody.EMPTY)).execute()
+			client.newCall(Request(url = url, method = "POST", body = RequestBody.EMPTY)).execute().close()
 		}
 	}
 }
