@@ -2,10 +2,10 @@
 
 package watch.dependency
 
-import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.command.SuspendingCliktCommand
+import com.github.ajalt.clikt.command.SuspendingNoOpCliktCommand
+import com.github.ajalt.clikt.command.main
 import com.github.ajalt.clikt.core.Context
-import com.github.ajalt.clikt.core.NoOpCliktCommand
-import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.convert
@@ -28,7 +28,6 @@ import java.nio.file.FileSystems
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.TimeZone
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
@@ -36,8 +35,9 @@ import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC
 import watch.dependency.RepositoryConfig.Companion.MAVEN_CENTRAL_ID
 
-fun main(vararg args: String) {
-	NoOpCliktCommand(name = "dependency-watch")
+suspend fun main(vararg args: String) {
+	// TODO Drop object once https://github.com/ajalt/clikt/pull/613 ships.
+	object : SuspendingNoOpCliktCommand(name = "dependency-watch") {}
 		.subcommands(
 			AwaitCommand(),
 			NotifyCommand(
@@ -49,7 +49,7 @@ fun main(vararg args: String) {
 		.main(args)
 }
 
-private abstract class DependencyWatchCommand(name: String) : CliktCommand(name) {
+private abstract class DependencyWatchCommand(name: String) : SuspendingCliktCommand(name) {
 	protected val debug by option(hidden = true)
 		.switch<Debug>(mapOf("--debug" to Debug.Console))
 		.default(Debug.Disabled)
@@ -66,7 +66,7 @@ private abstract class DependencyWatchCommand(name: String) : CliktCommand(name)
 		.help("Teams webhook URL to trigger (see https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors")
 		.convert { it.toHttpUrl() }
 
-	final override fun run() = runBlocking {
+	final override suspend fun run() {
 		val okhttp = OkHttpClient.Builder()
 			.apply {
 				if (debug.enabled) {
