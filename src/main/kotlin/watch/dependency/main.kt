@@ -36,8 +36,7 @@ import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC
 import watch.dependency.RepositoryConfig.Companion.MAVEN_CENTRAL_ID
 
 suspend fun main(vararg args: String) {
-	// TODO Drop object once https://github.com/ajalt/clikt/pull/613 ships.
-	object : SuspendingNoOpCliktCommand(name = "dependency-watch") {}
+	SuspendingNoOpCliktCommand(name = "dependency-watch")
 		.subcommands(
 			AwaitCommand(),
 			NotifyCommand(
