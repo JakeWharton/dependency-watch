@@ -28,7 +28,7 @@ okhttp-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.
 xmlutil-core = { module = "io.github.pdvrieze.xmlutil:core", version.ref = "xmlutil" }
 xmlutil-serialization = { module = "io.github.pdvrieze.xmlutil:serialization", version.ref = "xmlutil" }
 
-mordant = "com.github.ajalt.mordant:mordant:3.0.2"
+mordant = "com.github.ajalt.mordant:mordant:3.1.0"
 tomlj = "org.tomlj:tomlj:1.1.1"
 clikt = "com.github.ajalt.clikt:clikt:5.1.0"
 cardiologist = "io.github.kevincianfarini.cardiologist:cardiologist:0.8.0"
