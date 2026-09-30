@@ -1,9 +1,14 @@
 package watch.dependency
 
+import dev.eav.tomlkt.Toml
+import dev.eav.tomlkt.TomlArray
+import dev.eav.tomlkt.TomlElement
+import dev.eav.tomlkt.TomlLiteral
+import dev.eav.tomlkt.TomlTable
+import dev.eav.tomlkt.getArray
+import dev.eav.tomlkt.getTable
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import org.tomlj.Toml
-import org.tomlj.TomlTable
 import watch.dependency.RepositoryConfig.Companion.GOOGLE_MAVEN_HOST
 import watch.dependency.RepositoryConfig.Companion.GOOGLE_MAVEN_ID
 import watch.dependency.RepositoryConfig.Companion.GOOGLE_MAVEN_NAME
@@ -39,15 +44,14 @@ data class RepositoryConfig(
 		private const val TOML_KEY_COORDINATES = "coordinates"
 
 		private fun TomlTable.getCoordinates(key: String): List<MavenCoordinate> {
-			val coordinateArray = getArray(key)!!
-			return (0 until coordinateArray.size())
-				.map(coordinateArray::getString)
+			return getArray(key)
+				.map { it.asStringStrict() }
 				.map(MavenCoordinate::parse)
 		}
 
 		private fun TomlTable.tryParseWellKnown(self: String, name: String, host: HttpUrl): RepositoryConfig {
 			var coordinates: List<MavenCoordinate>? = null
-			for (key in keySet()) {
+			for (key in keys) {
 				when (key) {
 					TOML_KEY_COORDINATES -> coordinates = getCoordinates(key)
 
@@ -67,11 +71,11 @@ data class RepositoryConfig(
 			var host: HttpUrl? = null
 			var type: RepositoryType = Maven2
 			var coordinates: List<MavenCoordinate>? = null
-			for (key in keySet()) {
+			for (key in keys) {
 				when (key) {
-					TOML_KEY_NAME -> name = getString(key)!!
-					TOML_KEY_HOST -> host = getString(key)!!.toHttpUrl()
-					TOML_KEY_TYPE -> type = RepositoryType.valueOf(getString(key)!!)
+					TOML_KEY_NAME -> name = getValue(key).asStringStrict()
+					TOML_KEY_HOST -> host = getValue(key).asStringStrict().toHttpUrl()
+					TOML_KEY_TYPE -> type = RepositoryType.valueOf(getValue(key).asStringStrict())
 					TOML_KEY_COORDINATES -> coordinates = getCoordinates(key)
 					else -> throw IllegalArgumentException("'$self' table contains unknown key '$key'")
 				}
@@ -81,13 +85,16 @@ data class RepositoryConfig(
 			return RepositoryConfig(name, host, type, coordinates)
 		}
 
+		private fun TomlElement.asStringStrict(): String {
+			require(this is TomlLiteral) { "Expected string literal but was ${this::class.simpleName}" }
+			require(this.type == TomlLiteral.Type.String) { "Expected string literal but was ${this.type}" }
+			return this.content
+		}
+
 		fun parseConfigsFromToml(toml: String): List<RepositoryConfig> = buildList {
-			val parseResult = Toml.parse(toml)
-			require(!parseResult.hasErrors()) {
-				"Unable to parse TOML config:\n\n * " + parseResult.errors().joinToString("\n *")
-			}
-			for (key in parseResult.keySet()) {
-				val table = parseResult.getTable(key)!!
+			val parseResult = Toml.decodeFromString(TomlTable.serializer(), toml)
+			for (key in parseResult.keys) {
+				val table = parseResult.getTable(key)
 				this += when (key) {
 					MAVEN_CENTRAL_ID -> table.tryParseWellKnown(MAVEN_CENTRAL_ID, MAVEN_CENTRAL_NAME, MAVEN_CENTRAL_HOST)
 					GOOGLE_MAVEN_ID -> table.tryParseWellKnown(GOOGLE_MAVEN_ID, GOOGLE_MAVEN_NAME, GOOGLE_MAVEN_HOST)
