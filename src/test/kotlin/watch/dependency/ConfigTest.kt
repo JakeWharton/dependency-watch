@@ -6,7 +6,6 @@ import kotlin.test.assertFailsWith
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.tomlj.TomlInvalidTypeException
 import watch.dependency.RepositoryConfig.Companion.GOOGLE_MAVEN_HOST
 import watch.dependency.RepositoryConfig.Companion.GOOGLE_MAVEN_NAME
 import watch.dependency.RepositoryConfig.Companion.MAVEN_CENTRAL_HOST
@@ -46,7 +45,7 @@ class ConfigTest {
 	}
 
 	@Test fun mavenCentralNonTableThrows() {
-		assertFailsWith<TomlInvalidTypeException> {
+		assertFailsWith<IllegalStateException> {
 			RepositoryConfig.parseConfigsFromToml(
 				"""
 			|MavenCentral = "foo"
@@ -69,7 +68,7 @@ class ConfigTest {
 	}
 
 	@Test fun mavenCentralNonArrayCoordinatesThrows() {
-		assertFailsWith<TomlInvalidTypeException> {
+		assertFailsWith<IllegalStateException> {
 			RepositoryConfig.parseConfigsFromToml(
 				"""
 			|[MavenCentral]
@@ -81,7 +80,7 @@ class ConfigTest {
 	}
 
 	@Test fun mavenCentralNonStringCoordinatesThrows() {
-		assertFailsWith<TomlInvalidTypeException> {
+		assertFailsWith<IllegalArgumentException> {
 			RepositoryConfig.parseConfigsFromToml(
 				"""
 			|[MavenCentral]
@@ -203,7 +202,7 @@ class ConfigTest {
 	}
 
 	@Test fun googleMavenNonTableThrows() {
-		assertFailsWith<TomlInvalidTypeException> {
+		assertFailsWith<IllegalStateException> {
 			RepositoryConfig.parseConfigsFromToml(
 				"""
 			|GoogleMaven = "foo"
@@ -226,7 +225,7 @@ class ConfigTest {
 	}
 
 	@Test fun googleMavenNonArrayCoordinatesThrows() {
-		assertFailsWith<TomlInvalidTypeException> {
+		assertFailsWith<IllegalStateException> {
 			RepositoryConfig.parseConfigsFromToml(
 				"""
 			|[GoogleMaven]
@@ -238,7 +237,7 @@ class ConfigTest {
 	}
 
 	@Test fun googleMavenNonStringCoordinatesThrows() {
-		assertFailsWith<TomlInvalidTypeException> {
+		assertFailsWith<IllegalArgumentException> {
 			RepositoryConfig.parseConfigsFromToml(
 				"""
 			|[GoogleMaven]
@@ -361,7 +360,7 @@ class ConfigTest {
 	}
 
 	@Test fun customRepoNonTableThrows() {
-		assertFailsWith<TomlInvalidTypeException> {
+		assertFailsWith<IllegalStateException> {
 			RepositoryConfig.parseConfigsFromToml(
 				"""
 			|CustomRepo = "foo"
@@ -399,7 +398,7 @@ class ConfigTest {
 	}
 
 	@Test fun customRepoNonStringNameThrows() {
-		assertFailsWith<TomlInvalidTypeException> {
+		assertFailsWith<IllegalArgumentException> {
 			RepositoryConfig.parseConfigsFromToml(
 				"""
 			|[CustomRepo]
@@ -443,7 +442,7 @@ class ConfigTest {
 	}
 
 	@Test fun customRepoNonStringTypeThrows() {
-		assertFailsWith<TomlInvalidTypeException> {
+		assertFailsWith<IllegalArgumentException> {
 			RepositoryConfig.parseConfigsFromToml(
 				"""
 			|[CustomRepo]
@@ -476,7 +475,7 @@ class ConfigTest {
 	}
 
 	@Test fun customRepoNonStringHostThrows() {
-		assertFailsWith<TomlInvalidTypeException> {
+		assertFailsWith<IllegalArgumentException> {
 			RepositoryConfig.parseConfigsFromToml(
 				"""
 			|[CustomRepo]
@@ -505,7 +504,7 @@ class ConfigTest {
 	}
 
 	@Test fun customRepoNonArrayCoordinatesThrows() {
-		assertFailsWith<TomlInvalidTypeException> {
+		assertFailsWith<IllegalStateException> {
 			RepositoryConfig.parseConfigsFromToml(
 				"""
 			|[CustomRepo]
@@ -517,7 +516,7 @@ class ConfigTest {
 	}
 
 	@Test fun customRepoNonStringCoordinatesThrows() {
-		assertFailsWith<TomlInvalidTypeException> {
+		assertFailsWith<IllegalArgumentException> {
 			RepositoryConfig.parseConfigsFromToml(
 				"""
 			|[CustomRepo]
