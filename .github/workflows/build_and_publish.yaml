@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: 'zulu'
-          java-version: 21
+          java-version-file: .github/workflows/.java-version
 
       - uses: crazy-max/ghaction-docker-meta@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         id: docker_meta
