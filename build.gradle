@@ -71,6 +71,10 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 test {
+	javaLauncher = javaToolchains.launcherFor {
+		languageVersion = JavaLanguageVersion.of(8)
+		vendor = JvmVendorSpec.AZUL
+	}
 	testLogging {
 		showStackTraces = true
 		exceptionFormat = 'full'

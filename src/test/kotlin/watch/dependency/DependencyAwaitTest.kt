@@ -67,12 +67,12 @@ class DependencyAwaitTest {
 		backgroundScope.launch(start = UNDISPATCHED) {
 			createApp().await(MavenCoordinate("com.example", "example"), "1.0")
 		}
-		assertThat(progress.readUtf8()).isEqualTo("Last checked: Jan 1, 1970, 12:00:00\u202FAM\n")
+		assertThat(progress.readUtf8()).isEqualTo("Last checked: Jan 1, 1970 12:00:00 AM\n")
 
 		advanceTimeBy(5.seconds)
 		assertThat(progress.readUtf8()).isEqualTo("")
 		runCurrent()
-		assertThat(progress.readUtf8()).isEqualTo("\u001B[F\u001B[KLast checked: Jan 1, 1970, 12:00:05\u202FAM\n")
+		assertThat(progress.readUtf8()).isEqualTo("\u001B[F\u001B[KLast checked: Jan 1, 1970 12:00:05 AM\n")
 
 		mavenRepository.addArtifact(MavenCoordinate("com.example", "example"), "1.0")
 		advanceTimeBy(5.seconds)
