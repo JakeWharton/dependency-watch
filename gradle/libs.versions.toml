@@ -2,7 +2,7 @@
 kotlin = "2.4.21"
 okhttp = "5.5.1"
 kotlinx-coroutines = "1.11.0"
-kotlinx-serialization = "1.11.0"
+kotlinx-serialization = "1.12.0"
 xmlutil = "0.91.3"
 
 [libraries]
